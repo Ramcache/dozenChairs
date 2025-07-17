@@ -1,0 +1,2 @@
+# dozenChairs
+Проект на Go
