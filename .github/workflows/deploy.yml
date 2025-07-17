@@ -31,7 +31,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "main,migrations"
-          target: /edutalks/
+          target: /dozenChairs/
           debug: true
 
       - name: 🧬 Run Goose migrations and restart app
@@ -41,10 +41,10 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /edutalks
+            cd /dozenChairs
 
             echo "⏫ Running Goose migrations..."
-            /root/goproject/bin/goose -dir ./migrations postgres "postgres://postgres:625325@localhost:5432/edutalks_db?sslmode=disable" up
+            /root/goproject/bin/goose -dir ./migrations postgres "postgres://postgres:625325@localhost:5432/dozenChairs_db?sslmode=disable" up
 
             echo "🔁 Restarting app..."
             pkill main || true
