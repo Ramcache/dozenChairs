@@ -15,6 +15,169 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/chairs": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "chairs"
+                ],
+                "summary": "Получить все стулья",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Chair"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "chairs"
+                ],
+                "summary": "Создать стул",
+                "parameters": [
+                    {
+                        "description": "Стул",
+                        "name": "chair",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Chair"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Chair"
+                        }
+                    }
+                }
+            }
+        },
+        "/chairs/{slug}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "chairs"
+                ],
+                "summary": "Получить стул по slug",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Slug",
+                        "name": "slug",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Chair"
+                        }
+                    },
+                    "404": {
+                        "description": "Не найден",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "chairs"
+                ],
+                "summary": "Удалить стул по slug",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Slug",
+                        "name": "slug",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Не найден",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "chairs"
+                ],
+                "summary": "Обновить стул по slug",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Slug",
+                        "name": "slug",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Обновляемые данные",
+                        "name": "chair",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Chair"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Некорректные данные",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Не найден",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/login": {
             "post": {
                 "consumes": [
@@ -165,6 +328,93 @@ const docTemplate = `{
                 },
                 "username": {
                     "type": "string"
+                }
+            }
+        },
+        "models.Chair": {
+            "type": "object",
+            "properties": {
+                "attributes": {
+                    "$ref": "#/definitions/models.ChairAttributes"
+                },
+                "category": {
+                    "description": "всегда \"chair\"",
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "images": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "inStock": {
+                    "type": "boolean"
+                },
+                "oldPrice": {
+                    "type": "integer"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "description": "всегда \"product\"",
+                    "type": "string"
+                },
+                "unitCount": {
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ChairAttributes": {
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string"
+                },
+                "colorFrame": {
+                    "type": "string"
+                },
+                "colorPillow": {
+                    "type": "string"
+                },
+                "material": {
+                    "type": "string"
+                },
+                "materialFrame": {
+                    "type": "string"
+                },
+                "materialPillow": {
+                    "type": "string"
+                },
+                "totalHeight": {
+                    "type": "integer"
+                },
+                "width": {
+                    "type": "integer"
                 }
             }
         },
