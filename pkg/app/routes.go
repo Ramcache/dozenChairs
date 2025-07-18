@@ -19,6 +19,17 @@ func InitRoutes(pool *pgxpool.Pool) http.Handler {
 	repo := repository.NewUserRepository(pool)
 	service := services.NewUserService(repo)
 	handler := handlers.NewAuthHandler(service)
+
+	chairRepo := repository.NewChairRepository(pool)
+	chairService := services.NewChairService(chairRepo)
+	chairHandler := handlers.NewChairHandler(chairService)
+
+	r.Post("/chairs", chairHandler.Create)
+	r.Get("/chairs", chairHandler.GetAll)
+	r.Get("/chairs/{slug}", chairHandler.GetBySlug)
+	r.Patch("/chairs/{slug}", chairHandler.UpdateBySlug)
+	r.Delete("/chairs/{slug}", chairHandler.DeleteBySlug)
+
 	r.Get("/swagger/*", httpSwagger.WrapHandler)
 
 	r.Post("/register", handler.Register)

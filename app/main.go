@@ -25,7 +25,7 @@ func main() {
 	if err != nil {
 		log.Fatal("Ошибка подключения к БД: ", err)
 	}
-	defer pool.Close()
+	defer pool.Close() // defet
 
 	r := app.InitRoutes(pool)
 
