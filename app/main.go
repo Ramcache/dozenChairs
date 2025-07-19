@@ -10,6 +10,7 @@ import (
 	_ "dozenChairs/docs"
 
 	"github.com/joho/godotenv"
+	"github.com/rs/cors"
 )
 
 // @title DozenChairs API
@@ -26,9 +27,14 @@ func main() {
 		log.Fatal("Ошибка подключения к БД: ", err)
 	}
 	defer pool.Close() // defet
-
+	corsMiddleware := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowCredentials: true,
+		AllowedMethods:   []string{"GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Authorization", "Content-Type"},
+	})
 	r := app.InitRoutes(pool)
 
 	log.Println("Сервер запущен на :8080")
-	http.ListenAndServe(":8080", r)
+	http.ListenAndServe(":8080", corsMiddleware.Handler(r))
 }
