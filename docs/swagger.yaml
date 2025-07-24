@@ -1,37 +1,9 @@
 basePath: /
 definitions:
-  handlers.LoginRequest:
-    properties:
-      email_or_username:
-        type: string
-      password:
-        type: string
-    type: object
-  handlers.LoginResponse:
-    properties:
-      token:
-        type: string
-      user: {}
-    type: object
-  handlers.RegisterRequest:
-    properties:
-      address:
-        type: string
-      email:
-        type: string
-      full_name:
-        type: string
-      password:
-        type: string
-      phone:
-        type: string
-      username:
-        type: string
-    type: object
-  models.Chair:
+  dozenChairs_internal_models.Chair:
     properties:
       attributes:
-        $ref: '#/definitions/models.ChairAttributes'
+        $ref: '#/definitions/dozenChairs_internal_models.ChairAttributes'
       category:
         description: всегда "chair"
         type: string
@@ -67,7 +39,7 @@ definitions:
       updatedAt:
         type: string
     type: object
-  models.ChairAttributes:
+  dozenChairs_internal_models.ChairAttributes:
     properties:
       color:
         type: string
@@ -86,7 +58,7 @@ definitions:
       width:
         type: integer
     type: object
-  models.User:
+  dozenChairs_internal_models.User:
     properties:
       address:
         type: string
@@ -107,6 +79,34 @@ definitions:
       username:
         type: string
     type: object
+  internal_handlers.LoginRequest:
+    properties:
+      email_or_username:
+        type: string
+      password:
+        type: string
+    type: object
+  internal_handlers.LoginResponse:
+    properties:
+      token:
+        type: string
+      user: {}
+    type: object
+  internal_handlers.RegisterRequest:
+    properties:
+      address:
+        type: string
+      email:
+        type: string
+      full_name:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      username:
+        type: string
+    type: object
 info:
   contact: {}
   description: API для магазина мебели
@@ -122,7 +122,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.Chair'
+              $ref: '#/definitions/dozenChairs_internal_models.Chair'
             type: array
       summary: Получить все стулья
       tags:
@@ -136,14 +136,14 @@ paths:
         name: chair
         required: true
         schema:
-          $ref: '#/definitions/models.Chair'
+          $ref: '#/definitions/dozenChairs_internal_models.Chair'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/models.Chair'
+            $ref: '#/definitions/dozenChairs_internal_models.Chair'
       summary: Создать стул
       tags:
       - chairs
@@ -180,7 +180,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Chair'
+            $ref: '#/definitions/dozenChairs_internal_models.Chair'
         "404":
           description: Не найден
           schema:
@@ -202,7 +202,7 @@ paths:
         name: chair
         required: true
         schema:
-          $ref: '#/definitions/models.Chair'
+          $ref: '#/definitions/dozenChairs_internal_models.Chair'
       responses:
         "204":
           description: No Content
@@ -229,14 +229,14 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/handlers.LoginRequest'
+          $ref: '#/definitions/internal_handlers.LoginRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handlers.LoginResponse'
+            $ref: '#/definitions/internal_handlers.LoginResponse'
         "401":
           description: Неверные учетные данные
           schema:
@@ -252,7 +252,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.User'
+            $ref: '#/definitions/dozenChairs_internal_models.User'
         "401":
           description: Не авторизован
           schema:
@@ -272,14 +272,14 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/handlers.RegisterRequest'
+          $ref: '#/definitions/internal_handlers.RegisterRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/models.User'
+            $ref: '#/definitions/dozenChairs_internal_models.User'
         "400":
           description: Некорректный запрос
           schema:

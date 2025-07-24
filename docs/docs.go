@@ -30,7 +30,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Chair"
+                                "$ref": "#/definitions/dozenChairs_internal_models.Chair"
                             }
                         }
                     }
@@ -54,7 +54,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Chair"
+                            "$ref": "#/definitions/dozenChairs_internal_models.Chair"
                         }
                     }
                 ],
@@ -62,7 +62,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.Chair"
+                            "$ref": "#/definitions/dozenChairs_internal_models.Chair"
                         }
                     }
                 }
@@ -90,7 +90,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Chair"
+                            "$ref": "#/definitions/dozenChairs_internal_models.Chair"
                         }
                     },
                     "404": {
@@ -152,7 +152,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Chair"
+                            "$ref": "#/definitions/dozenChairs_internal_models.Chair"
                         }
                     }
                 ],
@@ -197,7 +197,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handlers.LoginRequest"
+                            "$ref": "#/definitions/internal_handlers.LoginRequest"
                         }
                     }
                 ],
@@ -205,7 +205,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handlers.LoginResponse"
+                            "$ref": "#/definitions/internal_handlers.LoginResponse"
                         }
                     },
                     "401": {
@@ -235,7 +235,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/dozenChairs_internal_models.User"
                         }
                     },
                     "401": {
@@ -266,7 +266,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handlers.RegisterRequest"
+                            "$ref": "#/definitions/internal_handlers.RegisterRequest"
                         }
                     }
                 ],
@@ -274,7 +274,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/dozenChairs_internal_models.User"
                         }
                     },
                     "400": {
@@ -288,54 +288,11 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "handlers.LoginRequest": {
-            "type": "object",
-            "properties": {
-                "email_or_username": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                }
-            }
-        },
-        "handlers.LoginResponse": {
-            "type": "object",
-            "properties": {
-                "token": {
-                    "type": "string"
-                },
-                "user": {}
-            }
-        },
-        "handlers.RegisterRequest": {
-            "type": "object",
-            "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "full_name": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "phone": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.Chair": {
+        "dozenChairs_internal_models.Chair": {
             "type": "object",
             "properties": {
                 "attributes": {
-                    "$ref": "#/definitions/models.ChairAttributes"
+                    "$ref": "#/definitions/dozenChairs_internal_models.ChairAttributes"
                 },
                 "category": {
                     "description": "всегда \"chair\"",
@@ -389,7 +346,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.ChairAttributes": {
+        "dozenChairs_internal_models.ChairAttributes": {
             "type": "object",
             "properties": {
                 "color": {
@@ -418,7 +375,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.User": {
+        "dozenChairs_internal_models.User": {
             "type": "object",
             "properties": {
                 "address": {
@@ -443,6 +400,49 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "role": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_handlers.LoginRequest": {
+            "type": "object",
+            "properties": {
+                "email_or_username": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_handlers.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                },
+                "user": {}
+            }
+        },
+        "internal_handlers.RegisterRequest": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "full_name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "phone": {
                     "type": "string"
                 },
                 "username": {

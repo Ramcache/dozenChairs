@@ -56,7 +56,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Некорректный запрос", http.StatusBadRequest)
 		return
 	}
-
+	//
 	// Собираем модель для передачи в сервис
 	user := &models.User{
 		Username:     req.Username,
