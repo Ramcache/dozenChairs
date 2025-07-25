@@ -1,17 +1,28 @@
-basePath: /
+basePath: /api/v1
 definitions:
-  dozenChairs_internal_models.Chair:
+  dozenChairs_internal_models.IncludeItem:
+    properties:
+      productId:
+        type: string
+      quantity:
+        type: integer
+    required:
+    - productId
+    - quantity
+    type: object
+  dozenChairs_internal_models.Product:
     properties:
       attributes:
-        $ref: '#/definitions/dozenChairs_internal_models.ChairAttributes'
+        additionalProperties: true
+        type: object
       category:
-        description: всегда "chair"
         type: string
       createdAt:
         type: string
       description:
         type: string
       id:
+        description: можно добавить `uuid4` при необходимости
         type: string
       images:
         items:
@@ -19,11 +30,19 @@ definitions:
         type: array
       inStock:
         type: boolean
+      includes:
+        description: только для sets
+        items:
+          $ref: '#/definitions/dozenChairs_internal_models.IncludeItem'
+        type: array
       oldPrice:
+        minimum: 0
         type: integer
       price:
+        minimum: 0
         type: integer
       slug:
+        description: можно добавить custom slug-валидацию
         type: string
       tags:
         items:
@@ -32,88 +51,51 @@ definitions:
       title:
         type: string
       type:
-        description: всегда "product"
-        type: string
+        allOf:
+        - $ref: '#/definitions/dozenChairs_internal_models.ProductType'
+        enum:
+        - product
+        - set
       unitCount:
+        minimum: 0
         type: integer
       updatedAt:
         type: string
+    required:
+    - category
+    - id
+    - slug
+    - title
+    - type
     type: object
-  dozenChairs_internal_models.ChairAttributes:
+  dozenChairs_internal_models.ProductType:
+    enum:
+    - product
+    - set
+    type: string
+    x-enum-varnames:
+    - TypeProduct
+    - TypeSet
+  dozenChairs_pkg_httphelper.APIResponse:
     properties:
-      color:
-        type: string
-      colorFrame:
-        type: string
-      colorPillow:
-        type: string
-      material:
-        type: string
-      materialFrame:
-        type: string
-      materialPillow:
-        type: string
-      totalHeight:
-        type: integer
-      width:
-        type: integer
+      data: {}
+      error: {}
+      meta: {}
     type: object
-  dozenChairs_internal_models.User:
-    properties:
-      address:
-        type: string
-      created_at:
-        type: string
-      email:
-        type: string
-      email_verified:
-        type: boolean
-      full_name:
-        type: string
-      id:
-        type: integer
-      phone:
-        type: string
-      role:
-        type: string
-      username:
-        type: string
-    type: object
-  internal_handlers.LoginRequest:
-    properties:
-      email_or_username:
-        type: string
-      password:
-        type: string
-    type: object
-  internal_handlers.LoginResponse:
-    properties:
-      token:
-        type: string
-      user: {}
-    type: object
-  internal_handlers.RegisterRequest:
-    properties:
-      address:
-        type: string
-      email:
-        type: string
-      full_name:
-        type: string
-      password:
-        type: string
-      phone:
-        type: string
-      username:
-        type: string
-    type: object
+host: localhost:8080
 info:
-  contact: {}
-  description: API для магазина мебели
+  contact:
+    email: support@dozenchairs.io
+    name: API Support
+  description: REST API for managing chairs, tables and sets
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
   title: DozenChairs API
   version: "1.0"
 paths:
-  /chairs:
+  /categories:
     get:
       produces:
       - application/json
@@ -121,55 +103,106 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/dozenChairs_internal_models.Chair'
-            type: array
-      summary: Получить все стулья
+            $ref: '#/definitions/dozenChairs_pkg_httphelper.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dozenChairs_pkg_httphelper.APIResponse'
+      summary: Получить список категорий
       tags:
-      - chairs
+      - Products
+  /products:
+    get:
+      parameters:
+      - description: Тип товара (product или set)
+        in: query
+        name: type
+        type: string
+      - description: Категория
+        in: query
+        name: category
+        type: string
+      - description: Есть в наличии
+        in: query
+        name: inStock
+        type: boolean
+      - description: Сортировка (price или createdAt)
+        in: query
+        name: sort
+        type: string
+      - description: Лимит на страницу
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dozenChairs_pkg_httphelper.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dozenChairs_pkg_httphelper.APIResponse'
+      summary: Получить список товаров
+      tags:
+      - Products
     post:
       consumes:
       - application/json
       parameters:
-      - description: Стул
+      - description: Product JSON
         in: body
-        name: chair
+        name: product
         required: true
         schema:
-          $ref: '#/definitions/dozenChairs_internal_models.Chair'
+          $ref: '#/definitions/dozenChairs_internal_models.Product'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/dozenChairs_internal_models.Chair'
-      summary: Создать стул
+            $ref: '#/definitions/dozenChairs_pkg_httphelper.APIResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dozenChairs_pkg_httphelper.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dozenChairs_pkg_httphelper.APIResponse'
+      summary: Создать товар
       tags:
-      - chairs
-  /chairs/{slug}:
+      - Products
+  /products/{slug}:
     delete:
       parameters:
-      - description: Slug
+      - description: Slug товара
         in: path
         name: slug
         required: true
         type: string
+      produces:
+      - application/json
       responses:
         "204":
           description: No Content
+        "500":
+          description: Internal Server Error
           schema:
-            type: string
-        "404":
-          description: Не найден
-          schema:
-            type: string
-      summary: Удалить стул по slug
+            $ref: '#/definitions/dozenChairs_pkg_httphelper.APIResponse'
+      summary: Удалить товар по slug
       tags:
-      - chairs
+      - Products
     get:
       parameters:
-      - description: Slug
+      - description: Slug товара
         in: path
         name: slug
         required: true
@@ -180,113 +213,112 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dozenChairs_internal_models.Chair'
+            $ref: '#/definitions/dozenChairs_pkg_httphelper.APIResponse'
         "404":
-          description: Не найден
+          description: Not Found
           schema:
-            type: string
-      summary: Получить стул по slug
+            $ref: '#/definitions/dozenChairs_pkg_httphelper.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dozenChairs_pkg_httphelper.APIResponse'
+      summary: Получить товар по slug
       tags:
-      - chairs
-    patch:
+      - Products
+    put:
       consumes:
       - application/json
       parameters:
-      - description: Slug
+      - description: Slug товара
         in: path
         name: slug
         required: true
         type: string
-      - description: Обновляемые данные
+      - description: Обновленные данные товара
         in: body
-        name: chair
+        name: product
         required: true
         schema:
-          $ref: '#/definitions/dozenChairs_internal_models.Chair'
-      responses:
-        "204":
-          description: No Content
-          schema:
-            type: string
-        "400":
-          description: Некорректные данные
-          schema:
-            type: string
-        "404":
-          description: Не найден
-          schema:
-            type: string
-      summary: Обновить стул по slug
-      tags:
-      - chairs
-  /login:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: Данные для логина
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/internal_handlers.LoginRequest'
+          $ref: '#/definitions/dozenChairs_internal_models.Product'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/internal_handlers.LoginResponse'
-        "401":
-          description: Неверные учетные данные
+            $ref: '#/definitions/dozenChairs_pkg_httphelper.APIResponse'
+        "400":
+          description: Bad Request
           schema:
-            type: string
-      summary: Логин пользователя
+            $ref: '#/definitions/dozenChairs_pkg_httphelper.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dozenChairs_pkg_httphelper.APIResponse'
+      summary: Обновить товар по slug
       tags:
-      - auth
-  /profile:
+      - Products
+  /sets:
     get:
+      parameters:
+      - description: Есть в наличии
+        in: query
+        name: inStock
+        type: boolean
+      - description: Сортировка (price или createdAt)
+        in: query
+        name: sort
+        type: string
+      - description: Лимит на страницу
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение
+        in: query
+        name: offset
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dozenChairs_internal_models.User'
-        "401":
-          description: Не авторизован
+            $ref: '#/definitions/dozenChairs_pkg_httphelper.APIResponse'
+        "500":
+          description: Internal Server Error
           schema:
-            type: string
-      security:
-      - BearerAuth: []
-      summary: Получение профиля пользователя
+            $ref: '#/definitions/dozenChairs_pkg_httphelper.APIResponse'
+      summary: Получить список наборов
       tags:
-      - auth
-  /register:
-    post:
-      consumes:
-      - application/json
+      - Sets
+  /sets/{slug}:
+    get:
       parameters:
-      - description: Данные для регистрации
-        in: body
-        name: data
+      - description: Slug набора
+        in: path
+        name: slug
         required: true
-        schema:
-          $ref: '#/definitions/internal_handlers.RegisterRequest'
+        type: string
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
           schema:
-            $ref: '#/definitions/dozenChairs_internal_models.User'
+            $ref: '#/definitions/dozenChairs_pkg_httphelper.APIResponse'
         "400":
-          description: Некорректный запрос
+          description: Bad Request
           schema:
-            type: string
-      summary: Регистрация пользователя
+            $ref: '#/definitions/dozenChairs_pkg_httphelper.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dozenChairs_pkg_httphelper.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dozenChairs_pkg_httphelper.APIResponse'
+      summary: Получить набор по slug
       tags:
-      - auth
-schemes:
-- http
+      - Sets
 swagger: "2.0"
