@@ -9,29 +9,103 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "contact": {},
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "API Support",
+            "email": "support@dozenchairs.io"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/chairs": {
+        "/categories": {
             "get": {
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "chairs"
+                    "Products"
                 ],
-                "summary": "Получить все стулья",
+                "summary": "Получить список категорий",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Chair"
-                            }
+                            "$ref": "#/definitions/dozenChairs_pkg_httphelper.APIResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dozenChairs_pkg_httphelper.APIResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/products": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Получить список товаров",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Тип товара (product или set)",
+                        "name": "type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Категория",
+                        "name": "category",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Есть в наличии",
+                        "name": "inStock",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Сортировка (price или createdAt)",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Лимит на страницу",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Смещение",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dozenChairs_pkg_httphelper.APIResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dozenChairs_pkg_httphelper.APIResponse"
                         }
                     }
                 }
@@ -44,17 +118,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "chairs"
+                    "Products"
                 ],
-                "summary": "Создать стул",
+                "summary": "Создать товар",
                 "parameters": [
                     {
-                        "description": "Стул",
-                        "name": "chair",
+                        "description": "Product JSON",
+                        "name": "product",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Chair"
+                            "$ref": "#/definitions/dozenChairs_internal_models.Product"
                         }
                     }
                 ],
@@ -62,25 +136,37 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.Chair"
+                            "$ref": "#/definitions/dozenChairs_pkg_httphelper.APIResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dozenChairs_pkg_httphelper.APIResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dozenChairs_pkg_httphelper.APIResponse"
                         }
                     }
                 }
             }
         },
-        "/chairs/{slug}": {
+        "/products/{slug}": {
             "get": {
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "chairs"
+                    "Products"
                 ],
-                "summary": "Получить стул по slug",
+                "summary": "Получить товар по slug",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Slug",
+                        "description": "Slug товара",
                         "name": "slug",
                         "in": "path",
                         "required": true
@@ -90,197 +176,195 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Chair"
+                            "$ref": "#/definitions/dozenChairs_pkg_httphelper.APIResponse"
                         }
                     },
                     "404": {
-                        "description": "Не найден",
+                        "description": "Not Found",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/dozenChairs_pkg_httphelper.APIResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dozenChairs_pkg_httphelper.APIResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Обновить товар по slug",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Slug товара",
+                        "name": "slug",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Обновленные данные товара",
+                        "name": "product",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dozenChairs_internal_models.Product"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dozenChairs_pkg_httphelper.APIResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dozenChairs_pkg_httphelper.APIResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dozenChairs_pkg_httphelper.APIResponse"
                         }
                     }
                 }
             },
             "delete": {
-                "tags": [
-                    "chairs"
-                ],
-                "summary": "Удалить стул по slug",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Slug",
-                        "name": "slug",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "No Content",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "404": {
-                        "description": "Не найден",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            },
-            "patch": {
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "chairs"
-                ],
-                "summary": "Обновить стул по slug",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Slug",
-                        "name": "slug",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Обновляемые данные",
-                        "name": "chair",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.Chair"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "No Content",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "Некорректные данные",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "404": {
-                        "description": "Не найден",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/login": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Products"
                 ],
-                "summary": "Логин пользователя",
+                "summary": "Удалить товар по slug",
                 "parameters": [
                     {
-                        "description": "Данные для логина",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/handlers.LoginRequest"
-                        }
+                        "type": "string",
+                        "description": "Slug товара",
+                        "name": "slug",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.LoginResponse"
-                        }
+                    "204": {
+                        "description": "No Content"
                     },
-                    "401": {
-                        "description": "Неверные учетные данные",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/dozenChairs_pkg_httphelper.APIResponse"
                         }
                     }
                 }
             }
         },
-        "/profile": {
+        "/sets": {
             "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Sets"
                 ],
-                "summary": "Получение профиля пользователя",
+                "summary": "Получить список наборов",
+                "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "Есть в наличии",
+                        "name": "inStock",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Сортировка (price или createdAt)",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Лимит на страницу",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Смещение",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/dozenChairs_pkg_httphelper.APIResponse"
                         }
                     },
-                    "401": {
-                        "description": "Не авторизован",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/dozenChairs_pkg_httphelper.APIResponse"
                         }
                     }
                 }
             }
         },
-        "/register": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
+        "/sets/{slug}": {
+            "get": {
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Sets"
                 ],
-                "summary": "Регистрация пользователя",
+                "summary": "Получить набор по slug",
                 "parameters": [
                     {
-                        "description": "Данные для регистрации",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/handlers.RegisterRequest"
-                        }
+                        "type": "string",
+                        "description": "Slug набора",
+                        "name": "slug",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/dozenChairs_pkg_httphelper.APIResponse"
                         }
                     },
                     "400": {
-                        "description": "Некорректный запрос",
+                        "description": "Bad Request",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/dozenChairs_pkg_httphelper.APIResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dozenChairs_pkg_httphelper.APIResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dozenChairs_pkg_httphelper.APIResponse"
                         }
                     }
                 }
@@ -288,57 +372,36 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "handlers.LoginRequest": {
+        "dozenChairs_internal_models.IncludeItem": {
             "type": "object",
+            "required": [
+                "productId",
+                "quantity"
+            ],
             "properties": {
-                "email_or_username": {
+                "productId": {
                     "type": "string"
                 },
-                "password": {
-                    "type": "string"
+                "quantity": {
+                    "type": "integer"
                 }
             }
         },
-        "handlers.LoginResponse": {
+        "dozenChairs_internal_models.Product": {
             "type": "object",
-            "properties": {
-                "token": {
-                    "type": "string"
-                },
-                "user": {}
-            }
-        },
-        "handlers.RegisterRequest": {
-            "type": "object",
-            "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "full_name": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "phone": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.Chair": {
-            "type": "object",
+            "required": [
+                "category",
+                "id",
+                "slug",
+                "title",
+                "type"
+            ],
             "properties": {
                 "attributes": {
-                    "$ref": "#/definitions/models.ChairAttributes"
+                    "type": "object",
+                    "additionalProperties": true
                 },
                 "category": {
-                    "description": "всегда \"chair\"",
                     "type": "string"
                 },
                 "createdAt": {
@@ -348,6 +411,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
+                    "description": "можно добавить ` + "`" + `uuid4` + "`" + ` при необходимости",
                     "type": "string"
                 },
                 "images": {
@@ -359,13 +423,23 @@ const docTemplate = `{
                 "inStock": {
                     "type": "boolean"
                 },
+                "includes": {
+                    "description": "только для sets",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dozenChairs_internal_models.IncludeItem"
+                    }
+                },
                 "oldPrice": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 },
                 "price": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 },
                 "slug": {
+                    "description": "можно добавить custom slug-валидацию",
                     "type": "string"
                 },
                 "tags": {
@@ -378,76 +452,42 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "type": {
-                    "description": "всегда \"product\"",
-                    "type": "string"
+                    "enum": [
+                        "product",
+                        "set"
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/dozenChairs_internal_models.ProductType"
+                        }
+                    ]
                 },
                 "unitCount": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 },
                 "updatedAt": {
                     "type": "string"
                 }
             }
         },
-        "models.ChairAttributes": {
-            "type": "object",
-            "properties": {
-                "color": {
-                    "type": "string"
-                },
-                "colorFrame": {
-                    "type": "string"
-                },
-                "colorPillow": {
-                    "type": "string"
-                },
-                "material": {
-                    "type": "string"
-                },
-                "materialFrame": {
-                    "type": "string"
-                },
-                "materialPillow": {
-                    "type": "string"
-                },
-                "totalHeight": {
-                    "type": "integer"
-                },
-                "width": {
-                    "type": "integer"
-                }
-            }
+        "dozenChairs_internal_models.ProductType": {
+            "type": "string",
+            "enum": [
+                "product",
+                "set"
+            ],
+            "x-enum-varnames": [
+                "TypeProduct",
+                "TypeSet"
+            ]
         },
-        "models.User": {
+        "dozenChairs_pkg_httphelper.APIResponse": {
             "type": "object",
             "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "email_verified": {
-                    "type": "boolean"
-                },
-                "full_name": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "phone": {
-                    "type": "string"
-                },
-                "role": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
+                "data": {},
+                "error": {},
+                "meta": {}
             }
         }
     }
@@ -456,11 +496,11 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "",
-	BasePath:         "/",
-	Schemes:          []string{"http"},
+	Host:             "localhost:8080",
+	BasePath:         "/api/v1",
+	Schemes:          []string{},
 	Title:            "DozenChairs API",
-	Description:      "API для магазина мебели",
+	Description:      "REST API for managing chairs, tables and sets",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
