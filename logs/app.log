@@ -1,0 +1,3 @@
+2025-07-26T16:57:41.812+0300	INFO	app/main.go:73	server started	{"port": "8080"}
+2025-07-26T16:58:07.088+0300	INFO	app/main.go:83	shutting down server...
+2025-07-26T16:58:07.088+0300	INFO	app/main.go:91	server exited properly
