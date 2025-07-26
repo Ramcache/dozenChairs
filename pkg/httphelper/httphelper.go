@@ -12,17 +12,33 @@ func WriteJSON(w http.ResponseWriter, status int, data interface{}) {
 	_ = json.NewEncoder(w).Encode(data)
 }
 
+//
+//func WriteSuccess(w http.ResponseWriter, status int, data interface{}) {
+//	WriteJSON(w, status, Success(data))
+//}
+//
+
 func WriteSuccess(w http.ResponseWriter, status int, data interface{}) {
-	WriteJSON(w, status, Success(data))
+	WriteJSON(w, status, data) // 👈 просто отдаём объект
 }
+
+//
 
 func WriteSuccessWithMeta(w http.ResponseWriter, status int, data, meta interface{}) {
 	WriteJSON(w, status, SuccessWithMeta(data, meta))
 }
 
+//
+//func WriteError(w http.ResponseWriter, status int, msg string) {
+//	WriteJSON(w, status, Error(msg))
+//}
+//
+
 func WriteError(w http.ResponseWriter, status int, msg string) {
-	WriteJSON(w, status, Error(msg))
+	WriteJSON(w, status, map[string]string{"error": msg})
 }
+
+//
 
 // ParseInt — безопасное преобразование строки в число
 func ParseInt(s string, def int) int {
