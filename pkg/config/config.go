@@ -7,9 +7,15 @@ import (
 	"github.com/joho/godotenv"
 )
 
+type JWTConfig struct {
+	AccessSecret  string `mapstructure:"access_secret"`
+	RefreshSecret string `mapstructure:"refresh_secret"`
+}
+
 type Config struct {
-	ServerPort  string
-	DatabaseDSN string
+	ServerPort  string    `mapstructure:"server_port"`
+	DatabaseDSN string    `mapstructure:"database_dsn"`
+	JWT         JWTConfig `mapstructure:"jwt"`
 }
 
 func LoadConfig() *Config {
@@ -21,6 +27,10 @@ func LoadConfig() *Config {
 	return &Config{
 		ServerPort:  getEnv("SERVER_PORT", "8080"),
 		DatabaseDSN: getEnv("DATABASE_URL", ""),
+		JWT: JWTConfig{
+			AccessSecret:  getEnv("JWT_ACCESS_SECRET", ""),
+			RefreshSecret: getEnv("JWT_REFRESH_SECRET", ""),
+		},
 	}
 }
 

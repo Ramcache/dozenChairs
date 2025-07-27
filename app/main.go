@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	_ "dozenChairs/docs"
+	"dozenChairs/internal/auth"
 	"dozenChairs/internal/middlewares"
 	"dozenChairs/pkg/app"
 	"github.com/go-chi/chi/v5"
@@ -27,6 +28,9 @@ import (
 // @version 1.0
 // @description REST API for managing chairs, tables and sets
 // @termsOfService http://swagger.io/terms/
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 
 // @contact.name API Support
 // @contact.email ramaro@internet.ru
@@ -49,6 +53,14 @@ func main() {
 	}
 	defer conn.Close(context.Background())
 
+	userRepo := repository.NewUserRepo(conn)
+	sessionRepo := repository.NewSessionRepo(conn)
+	authService := services.NewAuthService(userRepo, sessionRepo)
+
+	jwtManager := auth.NewJWTManager(cfg.JWT.AccessSecret, cfg.JWT.RefreshSecret)
+
+	authHandler := handlers.NewAuthHandler(authService, zapLog, jwtManager)
+
 	productRepo := repository.NewProductRepo(conn)
 	productService := services.NewProductService(productRepo)
 	productHandler := handlers.NewProductHandler(productService, zapLog)
@@ -61,7 +73,7 @@ func main() {
 	r.Use(middlewares.Logger(zapLog))
 	r.Get("/swagger/*", httpSwagger.WrapHandler)
 
-	app.RegisterRoutes(r, productHandler)
+	app.RegisterRoutes(r, productHandler, authHandler, jwtManager)
 
 	srv := &http.Server{
 		Addr:    ":" + cfg.ServerPort,
