@@ -12,7 +12,7 @@ const docTemplate = `{
         "termsOfService": "http://swagger.io/terms/",
         "contact": {
             "name": "API Support",
-            "email": "support@dozenchairs.io"
+            "email": "ramaro@internet.ru"
         },
         "license": {
             "name": "MIT",
@@ -23,7 +23,185 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/categories": {
+        "/api/v1/auth/login": {
+            "post": {
+                "description": "Принимает email и пароль, возвращает access и refresh токены",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Авторизация пользователя",
+                "parameters": [
+                    {
+                        "description": "Данные авторизации",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dozenChairs_internal_dto.LoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dozenChairs_internal_dto.AuthResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dozenChairs_internal_dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dozenChairs_internal_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/logout": {
+            "post": {
+                "description": "Удаляет refresh токен из хранилища и куки",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Выход пользователя",
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dozenChairs_internal_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/me": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Возвращает профиль пользователя по access токену",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Получить информацию о текущем пользователе",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dozenChairs_internal_dto.UserResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dozenChairs_internal_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/refresh": {
+            "post": {
+                "description": "Обновляет access токен по refresh токену из куки",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Обновление access токена",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dozenChairs_internal_dto.AccessTokenResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dozenChairs_internal_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/register": {
+            "post": {
+                "description": "Создаёт нового пользователя и возвращает access и refresh токены",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Регистрация пользователя",
+                "parameters": [
+                    {
+                        "description": "Данные регистрации",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dozenChairs_internal_dto.RegisterRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dozenChairs_internal_dto.AuthResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dozenChairs_internal_dto.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/dozenChairs_internal_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/categories": {
             "get": {
                 "produces": [
                     "application/json"
@@ -36,7 +214,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dozenChairs_pkg_httphelper.APIResponse"
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
                         }
                     },
                     "500": {
@@ -48,8 +229,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/products": {
+        "/api/v1/products": {
             "get": {
+                "description": "Возвращает список товаров или наборов, можно фильтровать и сортировать",
                 "produces": [
                     "application/json"
                 ],
@@ -84,13 +266,13 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Лимит на страницу",
+                        "description": "Лимит на страницу (по умолчанию 20)",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Смещение",
+                        "description": "Смещение (по умолчанию 0)",
                         "name": "offset",
                         "in": "query"
                     }
@@ -99,7 +281,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dozenChairs_pkg_httphelper.APIResponse"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dozenChairs_internal_models.Product"
+                            }
                         }
                     },
                     "500": {
@@ -111,6 +296,12 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Только для админов. Создаёт новый товар или набор.",
                 "consumes": [
                     "application/json"
                 ],
@@ -123,7 +314,7 @@ const docTemplate = `{
                 "summary": "Создать товар",
                 "parameters": [
                     {
-                        "description": "Product JSON",
+                        "description": "Товар",
                         "name": "product",
                         "in": "body",
                         "required": true,
@@ -136,7 +327,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/dozenChairs_pkg_httphelper.APIResponse"
+                            "$ref": "#/definitions/dozenChairs_internal_models.Product"
                         }
                     },
                     "400": {
@@ -154,8 +345,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/products/{slug}": {
+        "/api/v1/products/{slug}": {
             "get": {
+                "description": "Возвращает один товар по его уникальному slug",
                 "produces": [
                     "application/json"
                 ],
@@ -176,7 +368,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dozenChairs_pkg_httphelper.APIResponse"
+                            "$ref": "#/definitions/dozenChairs_internal_models.Product"
                         }
                     },
                     "404": {
@@ -194,6 +386,12 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Только для админов. Обновляет данные товара по slug",
                 "consumes": [
                     "application/json"
                 ],
@@ -203,7 +401,7 @@ const docTemplate = `{
                 "tags": [
                     "Products"
                 ],
-                "summary": "Обновить товар по slug",
+                "summary": "Обновить товар",
                 "parameters": [
                     {
                         "type": "string",
@@ -213,7 +411,7 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "Обновленные данные товара",
+                        "description": "Обновлённые данные",
                         "name": "product",
                         "in": "body",
                         "required": true,
@@ -226,7 +424,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dozenChairs_pkg_httphelper.APIResponse"
+                            "$ref": "#/definitions/dozenChairs_internal_models.Product"
                         }
                     },
                     "400": {
@@ -244,13 +442,19 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Только для админов. Удаляет товар по slug",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Products"
                 ],
-                "summary": "Удалить товар по slug",
+                "summary": "Удалить товар",
                 "parameters": [
                     {
                         "type": "string",
@@ -273,8 +477,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/sets": {
+        "/api/v1/sets": {
             "get": {
+                "description": "Возвращает все товары типа set",
                 "produces": [
                     "application/json"
                 ],
@@ -312,7 +517,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dozenChairs_pkg_httphelper.APIResponse"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dozenChairs_internal_models.Product"
+                            }
                         }
                     },
                     "500": {
@@ -324,8 +532,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/sets/{slug}": {
+        "/api/v1/sets/{slug}": {
             "get": {
+                "description": "Возвращает товар типа set по его slug. Если это не set — ошибка.",
                 "produces": [
                     "application/json"
                 ],
@@ -346,7 +555,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dozenChairs_pkg_httphelper.APIResponse"
+                            "$ref": "#/definitions/dozenChairs_internal_models.Product"
                         }
                     },
                     "400": {
@@ -372,6 +581,87 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "dozenChairs_internal_dto.AccessTokenResponse": {
+            "type": "object",
+            "properties": {
+                "accessToken": {
+                    "type": "string"
+                }
+            }
+        },
+        "dozenChairs_internal_dto.AuthResponse": {
+            "type": "object",
+            "properties": {
+                "accessToken": {
+                    "type": "string"
+                },
+                "refreshToken": {
+                    "type": "string"
+                }
+            }
+        },
+        "dozenChairs_internal_dto.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "dozenChairs_internal_dto.LoginRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 6
+                }
+            }
+        },
+        "dozenChairs_internal_dto.RegisterRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "password",
+                "username"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 6
+                },
+                "username": {
+                    "type": "string",
+                    "minLength": 3
+                }
+            }
+        },
+        "dozenChairs_internal_dto.UserResponse": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                }
+            }
+        },
         "dozenChairs_internal_models.IncludeItem": {
             "type": "object",
             "required": [
@@ -489,6 +779,13 @@ const docTemplate = `{
                 "error": {},
                 "meta": {}
             }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

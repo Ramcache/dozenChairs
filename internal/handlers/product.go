@@ -26,49 +26,56 @@ func NewProductHandler(s services.ProductService, l logger.Logger) *ProductHandl
 	}
 }
 
-// Create
-// @Summary Создать товар
-// @Tags Products
-// @Accept json
-// @Produce json
-// @Param product body models.Product true "Product JSON"
-// @Success 201 {object} httphelper.APIResponse
-// @Failure 400 {object} httphelper.APIResponse
-// @Failure 500 {object} httphelper.APIResponse
-// @Router /products [post]
+// Create godoc
+// @Summary      Создать товар
+// @Description  Только для админов. Создаёт новый товар или набор.
+// @Tags         Products
+// @Security     BearerAuth
+// @Accept       json
+// @Produce      json
+// @Param        product  body      models.Product  true  "Товар"
+// @Success      201      {object}  models.Product
+// @Failure      400      {object}  httphelper.APIResponse
+// @Failure      500      {object}  httphelper.APIResponse
 func (h *ProductHandler) Create(w http.ResponseWriter, r *http.Request) {
+	if r.Header.Get("Content-Type") != "application/json" {
+		httphelper.WriteError(w, http.StatusUnsupportedMediaType, "Content-Type must be application/json")
+		return
+	}
+
 	var p models.Product
 	if err := json.NewDecoder(r.Body).Decode(&p); err != nil {
 		h.logger.Error("failed to decode product", zap.Error(err))
-		httphelper.WriteError(w, http.StatusBadRequest, "Invalid request body")
+		httphelper.WriteError(w, http.StatusBadRequest, "Invalid JSON body")
 		return
 	}
 
 	if err := validation.ValidateStruct(p); err != nil {
-		h.logger.Error("validation failed", zap.Error(err))
+		h.logger.Warn("product validation failed", zap.Error(err))
 		httphelper.WriteError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	if err := h.service.Create(&p); err != nil {
-		h.logger.Error("failed to create product", zap.String("id", p.ID), zap.Error(err))
+		h.logger.Error("product creation failed", zap.String("slug", p.Slug), zap.Error(err))
 		httphelper.WriteError(w, http.StatusInternalServerError, "Failed to create product")
 		return
 	}
 
-	h.logger.Info("product created successfully", zap.String("id", p.ID), zap.String("slug", p.Slug))
+	h.logger.Info("product created", zap.String("slug", p.Slug))
 	httphelper.WriteSuccess(w, http.StatusCreated, p)
 }
 
-// GetBySlug
-// @Summary Получить товар по slug
-// @Tags Products
-// @Produce json
-// @Param slug path string true "Slug товара"
-// @Success 200 {object} httphelper.APIResponse
-// @Failure 404 {object} httphelper.APIResponse
-// @Failure 500 {object} httphelper.APIResponse
-// @Router /products/{slug} [get]
+// GetBySlug godoc
+// @Summary      Получить товар по slug
+// @Description  Возвращает один товар по его уникальному slug
+// @Tags         Products
+// @Produce      json
+// @Param        slug  path      string  true  "Slug товара"
+// @Success      200   {object}  models.Product
+// @Failure      404   {object}  httphelper.APIResponse
+// @Failure      500   {object}  httphelper.APIResponse
+// @Router       /api/v1/products/{slug} [get]
 func (h *ProductHandler) GetBySlug(w http.ResponseWriter, r *http.Request) {
 	slug := chi.URLParam(r, "slug")
 
@@ -83,19 +90,20 @@ func (h *ProductHandler) GetBySlug(w http.ResponseWriter, r *http.Request) {
 	httphelper.WriteSuccess(w, http.StatusOK, p)
 }
 
-// GetAll
-// @Summary Получить список товаров
-// @Tags Products
-// @Produce json
-// @Param type query string false "Тип товара (product или set)"
-// @Param category query string false "Категория"
-// @Param inStock query boolean false "Есть в наличии"
-// @Param sort query string false "Сортировка (price или createdAt)"
-// @Param limit query int false "Лимит на страницу"
-// @Param offset query int false "Смещение"
-// @Success 200 {object} httphelper.APIResponse
-// @Failure 500 {object} httphelper.APIResponse
-// @Router /products [get]
+// GetAll godoc
+// @Summary      Получить список товаров
+// @Description  Возвращает список товаров или наборов, можно фильтровать и сортировать
+// @Tags         Products
+// @Produce      json
+// @Param        type     query    string  false  "Тип товара (product или set)"
+// @Param        category query    string  false  "Категория"
+// @Param        inStock  query    boolean false  "Есть в наличии"
+// @Param        sort     query    string  false  "Сортировка (price или createdAt)"
+// @Param        limit    query    int     false  "Лимит на страницу (по умолчанию 20)"
+// @Param        offset   query    int     false  "Смещение (по умолчанию 0)"
+// @Success      200      {array}  models.Product
+// @Failure      500      {object} httphelper.APIResponse
+// @Router       /api/v1/products [get]
 func (h *ProductHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 
@@ -123,17 +131,18 @@ func (h *ProductHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	httphelper.WriteSuccess(w, http.StatusOK, products)
 }
 
-// GetSets
-// @Summary Получить список наборов
-// @Tags Sets
-// @Produce json
-// @Param inStock query boolean false "Есть в наличии"
-// @Param sort query string false "Сортировка (price или createdAt)"
-// @Param limit query int false "Лимит на страницу"
-// @Param offset query int false "Смещение"
-// @Success 200 {object} httphelper.APIResponse
-// @Failure 500 {object} httphelper.APIResponse
-// @Router /sets [get]
+// GetSets godoc
+// @Summary      Получить список наборов
+// @Description  Возвращает все товары типа set
+// @Tags         Sets
+// @Produce      json
+// @Param        inStock query    boolean false  "Есть в наличии"
+// @Param        sort     query    string  false  "Сортировка (price или createdAt)"
+// @Param        limit    query    int     false  "Лимит на страницу"
+// @Param        offset   query    int     false  "Смещение"
+// @Success      200      {array}  models.Product
+// @Failure      500      {object} httphelper.APIResponse
+// @Router       /api/v1/sets [get]
 func (h *ProductHandler) GetSets(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 
@@ -160,16 +169,17 @@ func (h *ProductHandler) GetSets(w http.ResponseWriter, r *http.Request) {
 	httphelper.WriteSuccess(w, http.StatusOK, sets)
 }
 
-// GetSetBySlug
-// @Summary Получить набор по slug
-// @Tags Sets
-// @Produce json
-// @Param slug path string true "Slug набора"
-// @Success 200 {object} httphelper.APIResponse
-// @Failure 404 {object} httphelper.APIResponse
-// @Failure 400 {object} httphelper.APIResponse
-// @Failure 500 {object} httphelper.APIResponse
-// @Router /sets/{slug} [get]
+// GetSetBySlug godoc
+// @Summary      Получить набор по slug
+// @Description  Возвращает товар типа set по его slug. Если это не set — ошибка.
+// @Tags         Sets
+// @Produce      json
+// @Param        slug  path      string  true  "Slug набора"
+// @Success      200   {object}  models.Product
+// @Failure      400   {object}  httphelper.APIResponse
+// @Failure      404   {object}  httphelper.APIResponse
+// @Failure      500   {object}  httphelper.APIResponse
+// @Router       /api/v1/sets/{slug} [get]
 func (h *ProductHandler) GetSetBySlug(w http.ResponseWriter, r *http.Request) {
 	slug := chi.URLParam(r, "slug")
 
@@ -190,13 +200,13 @@ func (h *ProductHandler) GetSetBySlug(w http.ResponseWriter, r *http.Request) {
 	httphelper.WriteSuccess(w, http.StatusOK, p)
 }
 
-// GetCategories
-// @Summary Получить список категорий
-// @Tags Products
-// @Produce json
-// @Success 200 {object} httphelper.APIResponse
-// @Failure 500 {object} httphelper.APIResponse
-// @Router /categories [get]
+// GetCategories godoc
+// @Summary      Получить список категорий
+// @Tags         Products
+// @Produce      json
+// @Success      200  {array}  string
+// @Failure      500  {object} httphelper.APIResponse
+// @Router       /api/v1/categories [get]
 func (h *ProductHandler) GetCategories(w http.ResponseWriter, r *http.Request) {
 	categories, err := h.service.GetCategories()
 	if err != nil {
@@ -209,17 +219,19 @@ func (h *ProductHandler) GetCategories(w http.ResponseWriter, r *http.Request) {
 	httphelper.WriteSuccess(w, http.StatusOK, categories)
 }
 
-// Update
-// @Summary Обновить товар по slug
-// @Tags Products
-// @Accept json
-// @Produce json
-// @Param slug path string true "Slug товара"
-// @Param product body models.Product true "Обновленные данные товара"
-// @Success 200 {object} httphelper.APIResponse
-// @Failure 400 {object} httphelper.APIResponse
-// @Failure 500 {object} httphelper.APIResponse
-// @Router /products/{slug} [put]
+// Update godoc
+// @Summary      Обновить товар
+// @Description  Только для админов. Обновляет данные товара по slug
+// @Tags         Products
+// @Security     BearerAuth
+// @Accept       json
+// @Produce      json
+// @Param        slug     path      string          true  "Slug товара"
+// @Param        product  body      models.Product  true  "Обновлённые данные"
+// @Success      200      {object}  models.Product
+// @Failure      400      {object}  httphelper.APIResponse
+// @Failure      500      {object}  httphelper.APIResponse
+// @Router       /api/v1/products/{slug} [put]
 func (h *ProductHandler) Update(w http.ResponseWriter, r *http.Request) {
 	slug := chi.URLParam(r, "slug")
 	var p models.Product
@@ -246,14 +258,16 @@ func (h *ProductHandler) Update(w http.ResponseWriter, r *http.Request) {
 	httphelper.WriteSuccess(w, http.StatusOK, p)
 }
 
-// Delete
-// @Summary Удалить товар по slug
-// @Tags Products
-// @Produce json
-// @Param slug path string true "Slug товара"
-// @Success 204 "No Content"
-// @Failure 500 {object} httphelper.APIResponse
-// @Router /products/{slug} [delete]
+// Delete godoc
+// @Summary      Удалить товар
+// @Description  Только для админов. Удаляет товар по slug
+// @Tags         Products
+// @Security     BearerAuth
+// @Produce      json
+// @Param        slug  path  string  true  "Slug товара"
+// @Success      204   "No Content"
+// @Failure      500   {object} httphelper.APIResponse
+// @Router       /api/v1/products/{slug} [delete]
 func (h *ProductHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	slug := chi.URLParam(r, "slug")
 

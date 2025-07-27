@@ -1,5 +1,59 @@
 basePath: /api/v1
 definitions:
+  dozenChairs_internal_dto.AccessTokenResponse:
+    properties:
+      accessToken:
+        type: string
+    type: object
+  dozenChairs_internal_dto.AuthResponse:
+    properties:
+      accessToken:
+        type: string
+      refreshToken:
+        type: string
+    type: object
+  dozenChairs_internal_dto.ErrorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  dozenChairs_internal_dto.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 6
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  dozenChairs_internal_dto.RegisterRequest:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 6
+        type: string
+      username:
+        minLength: 3
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
+  dozenChairs_internal_dto.UserResponse:
+    properties:
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      role:
+        type: string
+    type: object
   dozenChairs_internal_models.IncludeItem:
     properties:
       productId:
@@ -85,7 +139,7 @@ definitions:
 host: localhost:8080
 info:
   contact:
-    email: support@dozenchairs.io
+    email: ramaro@internet.ru
     name: API Support
   description: REST API for managing chairs, tables and sets
   license:
@@ -95,7 +149,122 @@ info:
   title: DozenChairs API
   version: "1.0"
 paths:
-  /categories:
+  /api/v1/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Принимает email и пароль, возвращает access и refresh токены
+      parameters:
+      - description: Данные авторизации
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dozenChairs_internal_dto.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dozenChairs_internal_dto.AuthResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dozenChairs_internal_dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dozenChairs_internal_dto.ErrorResponse'
+      summary: Авторизация пользователя
+      tags:
+      - auth
+  /api/v1/auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Удаляет refresh токен из хранилища и куки
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dozenChairs_internal_dto.ErrorResponse'
+      summary: Выход пользователя
+      tags:
+      - auth
+  /api/v1/auth/me:
+    get:
+      description: Возвращает профиль пользователя по access токену
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dozenChairs_internal_dto.UserResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dozenChairs_internal_dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Получить информацию о текущем пользователе
+      tags:
+      - auth
+  /api/v1/auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Обновляет access токен по refresh токену из куки
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dozenChairs_internal_dto.AccessTokenResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dozenChairs_internal_dto.ErrorResponse'
+      summary: Обновление access токена
+      tags:
+      - auth
+  /api/v1/auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Создаёт нового пользователя и возвращает access и refresh токены
+      parameters:
+      - description: Данные регистрации
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dozenChairs_internal_dto.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dozenChairs_internal_dto.AuthResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dozenChairs_internal_dto.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/dozenChairs_internal_dto.ErrorResponse'
+      summary: Регистрация пользователя
+      tags:
+      - auth
+  /api/v1/categories:
     get:
       produces:
       - application/json
@@ -103,7 +272,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dozenChairs_pkg_httphelper.APIResponse'
+            items:
+              type: string
+            type: array
         "500":
           description: Internal Server Error
           schema:
@@ -111,8 +282,9 @@ paths:
       summary: Получить список категорий
       tags:
       - Products
-  /products:
+  /api/v1/products:
     get:
+      description: Возвращает список товаров или наборов, можно фильтровать и сортировать
       parameters:
       - description: Тип товара (product или set)
         in: query
@@ -130,11 +302,11 @@ paths:
         in: query
         name: sort
         type: string
-      - description: Лимит на страницу
+      - description: Лимит на страницу (по умолчанию 20)
         in: query
         name: limit
         type: integer
-      - description: Смещение
+      - description: Смещение (по умолчанию 0)
         in: query
         name: offset
         type: integer
@@ -144,7 +316,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dozenChairs_pkg_httphelper.APIResponse'
+            items:
+              $ref: '#/definitions/dozenChairs_internal_models.Product'
+            type: array
         "500":
           description: Internal Server Error
           schema:
@@ -155,8 +329,9 @@ paths:
     post:
       consumes:
       - application/json
+      description: Только для админов. Создаёт новый товар или набор.
       parameters:
-      - description: Product JSON
+      - description: Товар
         in: body
         name: product
         required: true
@@ -168,7 +343,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/dozenChairs_pkg_httphelper.APIResponse'
+            $ref: '#/definitions/dozenChairs_internal_models.Product'
         "400":
           description: Bad Request
           schema:
@@ -177,11 +352,14 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dozenChairs_pkg_httphelper.APIResponse'
+      security:
+      - BearerAuth: []
       summary: Создать товар
       tags:
       - Products
-  /products/{slug}:
+  /api/v1/products/{slug}:
     delete:
+      description: Только для админов. Удаляет товар по slug
       parameters:
       - description: Slug товара
         in: path
@@ -197,10 +375,13 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dozenChairs_pkg_httphelper.APIResponse'
-      summary: Удалить товар по slug
+      security:
+      - BearerAuth: []
+      summary: Удалить товар
       tags:
       - Products
     get:
+      description: Возвращает один товар по его уникальному slug
       parameters:
       - description: Slug товара
         in: path
@@ -213,7 +394,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dozenChairs_pkg_httphelper.APIResponse'
+            $ref: '#/definitions/dozenChairs_internal_models.Product'
         "404":
           description: Not Found
           schema:
@@ -228,13 +409,14 @@ paths:
     put:
       consumes:
       - application/json
+      description: Только для админов. Обновляет данные товара по slug
       parameters:
       - description: Slug товара
         in: path
         name: slug
         required: true
         type: string
-      - description: Обновленные данные товара
+      - description: Обновлённые данные
         in: body
         name: product
         required: true
@@ -246,7 +428,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dozenChairs_pkg_httphelper.APIResponse'
+            $ref: '#/definitions/dozenChairs_internal_models.Product'
         "400":
           description: Bad Request
           schema:
@@ -255,11 +437,14 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dozenChairs_pkg_httphelper.APIResponse'
-      summary: Обновить товар по slug
+      security:
+      - BearerAuth: []
+      summary: Обновить товар
       tags:
       - Products
-  /sets:
+  /api/v1/sets:
     get:
+      description: Возвращает все товары типа set
       parameters:
       - description: Есть в наличии
         in: query
@@ -283,7 +468,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dozenChairs_pkg_httphelper.APIResponse'
+            items:
+              $ref: '#/definitions/dozenChairs_internal_models.Product'
+            type: array
         "500":
           description: Internal Server Error
           schema:
@@ -291,8 +478,9 @@ paths:
       summary: Получить список наборов
       tags:
       - Sets
-  /sets/{slug}:
+  /api/v1/sets/{slug}:
     get:
+      description: Возвращает товар типа set по его slug. Если это не set — ошибка.
       parameters:
       - description: Slug набора
         in: path
@@ -305,7 +493,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dozenChairs_pkg_httphelper.APIResponse'
+            $ref: '#/definitions/dozenChairs_internal_models.Product'
         "400":
           description: Bad Request
           schema:
@@ -321,4 +509,9 @@ paths:
       summary: Получить набор по slug
       tags:
       - Sets
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

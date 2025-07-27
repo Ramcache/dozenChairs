@@ -1,3 +1,61 @@
 2025-07-26T16:57:41.812+0300	INFO	app/main.go:73	server started	{"port": "8080"}
 2025-07-26T16:58:07.088+0300	INFO	app/main.go:83	shutting down server...
 2025-07-26T16:58:07.088+0300	INFO	app/main.go:91	server exited properly
+2025-07-28T00:39:50.586+0300	INFO	app/main.go:82	server started	{"port": "8080"}
+2025-07-28T00:39:54.024+0300	INFO	app/main.go:92	shutting down server...
+2025-07-28T00:39:54.025+0300	INFO	app/main.go:100	server exited properly
+2025-07-28T00:55:35.569+0300	INFO	app/main.go:82	server started	{"port": "8080"}
+2025-07-28T00:56:00.239+0300	INFO	app/main.go:92	shutting down server...
+2025-07-28T00:56:00.239+0300	INFO	app/main.go:100	server exited properly
+2025-07-28T00:59:17.851+0300	INFO	app/main.go:82	server started	{"port": "8080"}
+2025-07-28T01:00:07.034+0300	INFO	logger/zap_logger.go:13	http request	{"method": "GET", "path": "/api/v1/auth/register", "status": 405, "remote": "[::1]:8576", "request_id": "76fef7ba-d1e0-4dbe-84f7-6fea88e6bffc", "duration": "0s"}
+2025-07-28T01:00:39.668+0300	INFO	logger/zap_logger.go:13	user registered	{"id": "3df189e3-7488-45d5-b1ac-c45bc031cad6", "email": "test@example.com"}
+2025-07-28T01:00:39.669+0300	INFO	logger/zap_logger.go:13	http request	{"method": "POST", "path": "/api/v1/auth/register", "status": 201, "remote": "[::1]:8576", "request_id": "75d7734a-5f42-4307-8987-0348601d5359", "duration": "128.6242ms"}
+2025-07-28T01:01:37.318+0300	INFO	logger/zap_logger.go:13	user logged in	{"id": "3df189e3-7488-45d5-b1ac-c45bc031cad6"}
+2025-07-28T01:01:37.318+0300	INFO	logger/zap_logger.go:13	http request	{"method": "POST", "path": "/api/v1/auth/login", "status": 200, "remote": "[::1]:8576", "request_id": "0d603d9b-3b6b-41a3-8dd3-20b9ab4f9b15", "duration": "90.5143ms"}
+2025-07-28T01:03:26.778+0300	INFO	logger/zap_logger.go:13	http request	{"method": "GET", "path": "/api/v1/auth/me", "status": 200, "remote": "[::1]:8602", "request_id": "5353cef1-4b58-4ed3-94bd-30c455f60755", "duration": "683.6µs"}
+2025-07-28T01:05:19.076+0300	INFO	app/main.go:92	shutting down server...
+2025-07-28T01:05:19.076+0300	INFO	app/main.go:100	server exited properly
+2025-07-28T01:05:30.553+0300	INFO	app/main.go:82	server started	{"port": "8080"}
+2025-07-28T01:05:31.855+0300	INFO	app/main.go:92	shutting down server...
+2025-07-28T01:05:31.856+0300	INFO	app/main.go:100	server exited properly
+2025-07-28T01:06:12.508+0300	INFO	app/main.go:82	server started	{"port": "8080"}
+2025-07-28T01:06:17.987+0300	INFO	logger/zap_logger.go:13	user registered	{"id": "7a47e046-2bf1-4583-a922-76374e7c333e", "email": "test@example.com"}
+2025-07-28T01:06:17.987+0300	INFO	logger/zap_logger.go:13	http request	{"method": "POST", "path": "/api/v1/auth/register", "status": 201, "remote": "[::1]:8640", "request_id": "e9643dd0-1103-41b5-851a-c1e840e2af60", "duration": "64.7616ms"}
+2025-07-28T01:06:21.659+0300	INFO	logger/zap_logger.go:13	user logged in	{"id": "7a47e046-2bf1-4583-a922-76374e7c333e"}
+2025-07-28T01:06:21.659+0300	INFO	logger/zap_logger.go:13	http request	{"method": "POST", "path": "/api/v1/auth/login", "status": 200, "remote": "[::1]:8640", "request_id": "7c28fb49-3198-4425-a6a4-53011ed42700", "duration": "72.1244ms"}
+2025-07-28T01:06:31.517+0300	INFO	logger/zap_logger.go:13	http request	{"method": "GET", "path": "/api/v1/auth/me", "status": 200, "remote": "[::1]:8640", "request_id": "c27bb6d4-cc2e-4e43-9df2-6aa373b9cf45", "duration": "1.1159ms"}
+2025-07-28T01:07:27.492+0300	INFO	app/main.go:92	shutting down server...
+2025-07-28T01:07:27.493+0300	INFO	app/main.go:100	server exited properly
+2025-07-28T01:08:04.087+0300	INFO	app/main.go:82	server started	{"port": "8080"}
+2025-07-28T01:08:14.027+0300	INFO	logger/zap_logger.go:13	user registered	{"id": "2ad2f820-b9a3-4059-b547-816c9a74f98f", "email": "test@example.com"}
+2025-07-28T01:08:14.027+0300	INFO	logger/zap_logger.go:13	http request	{"method": "POST", "path": "/api/v1/auth/register", "status": 201, "remote": "[::1]:8655", "request_id": "50a92b78-7024-462a-a780-3d55e35df843", "duration": "73.3455ms"}
+2025-07-28T01:08:16.268+0300	INFO	logger/zap_logger.go:13	user logged in	{"id": "2ad2f820-b9a3-4059-b547-816c9a74f98f"}
+2025-07-28T01:08:16.268+0300	INFO	logger/zap_logger.go:13	http request	{"method": "POST", "path": "/api/v1/auth/login", "status": 200, "remote": "[::1]:8655", "request_id": "1e2ffabd-0258-43d9-8731-dd1c62b4ab60", "duration": "80.0577ms"}
+2025-07-28T01:08:22.452+0300	INFO	logger/zap_logger.go:13	http request	{"method": "GET", "path": "/api/v1/auth/me", "status": 200, "remote": "[::1]:8655", "request_id": "3ee0554d-2f63-4141-a6a3-2909457bf8f1", "duration": "643.6µs"}
+2025-07-28T01:09:53.400+0300	INFO	app/main.go:92	shutting down server...
+2025-07-28T01:09:53.400+0300	INFO	app/main.go:100	server exited properly
+2025-07-28T01:09:56.200+0300	INFO	app/main.go:82	server started	{"port": "8080"}
+2025-07-28T01:10:05.353+0300	INFO	logger/zap_logger.go:13	user registered	{"id": "bc8fe593-d35c-4da8-884f-669a4eb1608f", "email": "test@example.com"}
+2025-07-28T01:10:05.354+0300	INFO	logger/zap_logger.go:13	http request	{"method": "POST", "path": "/api/v1/auth/register", "status": 201, "remote": "[::1]:8677", "request_id": "a896923f-a3e8-4193-ac5b-f5150f725f95", "duration": "67.1757ms"}
+2025-07-28T01:10:07.676+0300	INFO	logger/zap_logger.go:13	user logged in	{"id": "bc8fe593-d35c-4da8-884f-669a4eb1608f"}
+2025-07-28T01:10:07.676+0300	INFO	logger/zap_logger.go:13	http request	{"method": "POST", "path": "/api/v1/auth/login", "status": 200, "remote": "[::1]:8677", "request_id": "4cc653df-dbeb-4649-9497-3ee0a90972f4", "duration": "70.9414ms"}
+2025-07-28T01:10:13.496+0300	INFO	logger/zap_logger.go:13	http request	{"method": "GET", "path": "/api/v1/auth/me", "status": 200, "remote": "[::1]:8677", "request_id": "661f4207-879a-4d7b-a2e0-19ac206006d0", "duration": "505.5µs"}
+2025-07-28T01:11:34.145+0300	INFO	app/main.go:92	shutting down server...
+2025-07-28T01:11:34.145+0300	INFO	app/main.go:100	server exited properly
+2025-07-28T01:11:35.391+0300	INFO	app/main.go:82	server started	{"port": "8080"}
+2025-07-28T01:12:16.724+0300	INFO	app/main.go:92	shutting down server...
+2025-07-28T01:12:16.725+0300	INFO	app/main.go:100	server exited properly
+2025-07-28T01:12:17.972+0300	INFO	app/main.go:82	server started	{"port": "8080"}
+2025-07-28T01:13:00.586+0300	INFO	logger/zap_logger.go:13	http request	{"method": "POST", "path": "/api/v1/auth/refresh", "status": 200, "remote": "[::1]:8729", "request_id": "5eed3460-b42d-48f1-beae-ba388e77acc3", "duration": "6.078ms"}
+2025-07-28T01:13:37.397+0300	INFO	logger/zap_logger.go:13	http request	{"method": "POST", "path": "/api/v1/auth/logout", "status": 200, "remote": "[::1]:8729", "request_id": "5f3e118d-896a-45ab-9127-9fa2408221b5", "duration": "2.203ms"}
+2025-07-28T01:13:45.542+0300	INFO	logger/zap_logger.go:13	http request	{"method": "GET", "path": "/api/v1/auth/me", "status": 200, "remote": "[::1]:8729", "request_id": "7faf2239-59f6-4fb2-b52a-2548961c7b87", "duration": "516.8µs"}
+2025-07-28T01:13:53.048+0300	INFO	logger/zap_logger.go:13	http request	{"method": "POST", "path": "/api/v1/auth/logout", "status": 400, "remote": "[::1]:8729", "request_id": "5ac41955-8281-4e58-b926-38095361530b", "duration": "0s"}
+2025-07-28T01:14:13.215+0300	INFO	logger/zap_logger.go:13	http request	{"method": "POST", "path": "/api/v1/auth/refresh", "status": 401, "remote": "[::1]:8729", "request_id": "90ce68c7-1640-4c86-9fb1-44499ef63e20", "duration": "0s"}
+2025-07-28T01:14:18.491+0300	INFO	logger/zap_logger.go:13	user logged in	{"id": "bc8fe593-d35c-4da8-884f-669a4eb1608f"}
+2025-07-28T01:14:18.491+0300	INFO	logger/zap_logger.go:13	http request	{"method": "POST", "path": "/api/v1/auth/login", "status": 200, "remote": "[::1]:8729", "request_id": "69107bd3-6022-4c3e-bb91-9398dd583433", "duration": "79.6337ms"}
+2025-07-28T01:14:25.601+0300	INFO	logger/zap_logger.go:13	http request	{"method": "GET", "path": "/api/v1/auth/me", "status": 200, "remote": "[::1]:8729", "request_id": "1fb8348b-4489-4bd8-900c-051a74646c64", "duration": "0s"}
+2025-07-28T01:14:30.518+0300	INFO	logger/zap_logger.go:13	http request	{"method": "POST", "path": "/api/v1/auth/logout", "status": 200, "remote": "[::1]:8729", "request_id": "f36b9884-e0aa-4744-b9ea-03b8e948de0a", "duration": "814.2µs"}
+2025-07-28T01:14:36.343+0300	INFO	logger/zap_logger.go:13	http request	{"method": "POST", "path": "/api/v1/auth/refresh", "status": 401, "remote": "[::1]:8729", "request_id": "5614e5a0-1dd2-4a20-b3ff-3e4cbbbe3c55", "duration": "309.9µs"}
+2025-07-28T01:16:24.872+0300	INFO	app/main.go:92	shutting down server...
+2025-07-28T01:16:24.872+0300	INFO	app/main.go:100	server exited properly
