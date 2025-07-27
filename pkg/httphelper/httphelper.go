@@ -19,7 +19,7 @@ func WriteJSON(w http.ResponseWriter, status int, data interface{}) {
 //
 
 func WriteSuccess(w http.ResponseWriter, status int, data interface{}) {
-	WriteJSON(w, status, data) // 👈 просто отдаём объект
+	WriteJSON(w, status, data)
 }
 
 //
