@@ -16,6 +16,7 @@ type Config struct {
 	ServerPort  string    `mapstructure:"server_port"`
 	DatabaseDSN string    `mapstructure:"database_dsn"`
 	JWT         JWTConfig `mapstructure:"jwt"`
+	AuthEnabled bool      `mapstructure:"AUTH_ENABLED"`
 }
 
 func LoadConfig() *Config {
@@ -31,6 +32,7 @@ func LoadConfig() *Config {
 			AccessSecret:  getEnv("JWT_ACCESS_SECRET", ""),
 			RefreshSecret: getEnv("JWT_REFRESH_SECRET", ""),
 		},
+		AuthEnabled: getEnv("AUTH_ENABLED", "true") == "true",
 	}
 }
 

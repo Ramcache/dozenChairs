@@ -5,7 +5,7 @@ import (
 	"dozenChairs/internal/dto"
 	"dozenChairs/internal/models"
 	"dozenChairs/internal/repository"
-	security "dozenChairs/pkg/secutiry"
+	security "dozenChairs/pkg/security"
 	"fmt"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"

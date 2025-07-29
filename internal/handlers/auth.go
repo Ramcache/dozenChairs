@@ -7,7 +7,7 @@ import (
 	"dozenChairs/internal/services"
 	"dozenChairs/pkg/httphelper"
 	"dozenChairs/pkg/logger"
-	security "dozenChairs/pkg/secutiry"
+	security "dozenChairs/pkg/security"
 	"dozenChairs/pkg/validation"
 	"encoding/json"
 	"go.uber.org/zap"
