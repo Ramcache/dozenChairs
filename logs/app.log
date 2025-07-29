@@ -59,3 +59,135 @@
 2025-07-28T01:14:36.343+0300	INFO	logger/zap_logger.go:13	http request	{"method": "POST", "path": "/api/v1/auth/refresh", "status": 401, "remote": "[::1]:8729", "request_id": "5614e5a0-1dd2-4a20-b3ff-3e4cbbbe3c55", "duration": "309.9µs"}
 2025-07-28T01:16:24.872+0300	INFO	app/main.go:92	shutting down server...
 2025-07-28T01:16:24.872+0300	INFO	app/main.go:100	server exited properly
+2025-07-29T12:06:52.427+0300	INFO	app/main.go:36	server started	{"port": "8080"}
+2025-07-29T12:07:21.191+0300	INFO	httphelper/shutdown.go:19	shutting down server...
+2025-07-29T12:07:21.192+0300	INFO	httphelper/shutdown.go:28	server exited properly
+2025-07-29T12:07:35.467+0300	INFO	app/main.go:36	server started	{"port": "8080"}
+2025-07-29T12:12:44.901+0300	INFO	handlers/product.go:130	products fetched	{"count": 2}
+2025-07-29T12:12:44.901+0300	INFO	middlewares/logger.go:28	http request	{"method": "GET", "path": "/api/v1/products", "status": 200, "remote": "[::1]:1887", "request_id": "12b86fa9-060e-48b7-a2b7-8eb52533fc13", "duration": "13.4533ms"}
+2025-07-29T12:14:10.053+0300	INFO	handlers/auth.go:111	user logged in	{"id": "bc8fe593-d35c-4da8-884f-669a4eb1608f"}
+2025-07-29T12:14:10.054+0300	INFO	middlewares/logger.go:28	http request	{"method": "POST", "path": "/api/v1/auth/login", "status": 200, "remote": "[::1]:1895", "request_id": "945a911f-f023-4826-bbf0-9293203f0fef", "duration": "87.657ms"}
+2025-07-29T12:14:20.495+0300	INFO	middlewares/logger.go:28	http request	{"method": "POST", "path": "/api/v1/products/table-001/images", "status": 403, "remote": "[::1]:1895", "request_id": "ed1bfeff-83f8-451a-86b6-cab24038f2a4", "duration": "0s"}
+2025-07-29T12:14:54.454+0300	INFO	middlewares/logger.go:28	http request	{"method": "POST", "path": "/api/v1/products/table-001/images", "status": 403, "remote": "[::1]:1895", "request_id": "a2352046-8822-4e87-80ff-539facdd0612", "duration": "0s"}
+2025-07-29T12:15:32.656+0300	INFO	handlers/auth.go:111	user logged in	{"id": "bc8fe593-d35c-4da8-884f-669a4eb1608f"}
+2025-07-29T12:15:32.657+0300	INFO	middlewares/logger.go:28	http request	{"method": "POST", "path": "/api/v1/auth/login", "status": 200, "remote": "[::1]:1895", "request_id": "d71dae22-da6d-49f1-9cac-4697ca274c73", "duration": "66.1691ms"}
+2025-07-29T12:15:42.819+0300	INFO	middlewares/logger.go:28	http request	{"method": "POST", "path": "/api/v1/products/table-001/images", "status": 400, "remote": "[::1]:1895", "request_id": "fe25898a-634d-4a5e-97f3-701dd4dedf8d", "duration": "0s"}
+2025-07-29T12:25:42.351+0300	INFO	middlewares/logger.go:28	http request	{"method": "POST", "path": "/api/v1/products/table-001/images/upload", "status": 404, "remote": "[::1]:2060", "request_id": "93942d26-fafb-49cf-a4be-e67ae1a29d6a", "duration": "0s"}
+2025-07-29T12:25:49.788+0300	INFO	httphelper/shutdown.go:19	shutting down server...
+2025-07-29T12:25:49.789+0300	INFO	httphelper/shutdown.go:28	server exited properly
+2025-07-29T12:25:52.482+0300	INFO	app/main.go:36	server started	{"port": "8080"}
+2025-07-29T12:25:54.729+0300	INFO	middlewares/logger.go:28	http request	{"method": "POST", "path": "/api/v1/products/table-001/images/upload", "status": 500, "remote": "[::1]:2066", "request_id": "468bc24f-3a48-428c-a524-b14c8612c2e3", "duration": "551µs"}
+2025-07-29T12:33:35.233+0300	INFO	httphelper/shutdown.go:19	shutting down server...
+2025-07-29T12:33:35.234+0300	INFO	httphelper/shutdown.go:28	server exited properly
+2025-07-29T12:39:26.170+0300	INFO	app/main.go:36	server started	{"port": "8080"}
+2025-07-29T12:40:13.930+0300	INFO	handlers/product.go:130	products fetched	{"count": 2}
+2025-07-29T12:40:13.930+0300	INFO	middlewares/logger.go:28	http request	{"method": "GET", "path": "/api/v1/products", "status": 200, "remote": "[::1]:2229", "request_id": "d36ef20e-4007-4c40-a901-b370ec59622e", "duration": "4.5209ms"}
+2025-07-29T12:40:54.747+0300	INFO	middlewares/logger.go:28	http request	{"method": "POST", "path": "/api/v1/upload", "status": 404, "remote": "[::1]:2229", "request_id": "b0e735a1-ffa6-40b9-8974-f09513f8c39b", "duration": "0s"}
+2025-07-29T12:41:34.090+0300	INFO	httphelper/shutdown.go:19	shutting down server...
+2025-07-29T12:41:34.092+0300	INFO	httphelper/shutdown.go:28	server exited properly
+2025-07-29T12:41:36.604+0300	INFO	app/main.go:36	server started	{"port": "8080"}
+2025-07-29T12:41:38.513+0300	INFO	middlewares/logger.go:28	http request	{"method": "POST", "path": "/api/v1/upload", "status": 401, "remote": "[::1]:2256", "request_id": "a43c94b1-020a-4d35-a2db-70c2d3e30b49", "duration": "564µs"}
+2025-07-29T12:41:49.827+0300	INFO	middlewares/logger.go:28	http request	{"method": "POST", "path": "/api/v1/auth/refresh", "status": 200, "remote": "[::1]:2262", "request_id": "1915910c-aedb-47eb-88c2-e92145634589", "duration": "4.7835ms"}
+2025-07-29T12:42:00.616+0300	INFO	middlewares/logger.go:28	http request	{"method": "POST", "path": "/api/v1/upload", "status": 400, "remote": "[::1]:2262", "request_id": "e62e7ed1-f603-413a-b5e7-0d0963af5a85", "duration": "11.7102ms"}
+2025-07-29T12:42:13.521+0300	INFO	middlewares/logger.go:28	http request	{"method": "POST", "path": "/api/v1/upload", "status": 400, "remote": "[::1]:2262", "request_id": "303e7bae-05e6-430d-a076-da2616c7d240", "duration": "13.5179ms"}
+2025-07-29T12:43:14.914+0300	INFO	middlewares/logger.go:28	http request	{"method": "POST", "path": "/api/v1/upload", "status": 201, "remote": "[::1]:2281", "request_id": "d3568440-c076-4d11-96c0-8a993da3746a", "duration": "17.9135ms"}
+2025-07-29T12:43:27.024+0300	INFO	handlers/product.go:130	products fetched	{"count": 2}
+2025-07-29T12:43:27.024+0300	INFO	middlewares/logger.go:28	http request	{"method": "GET", "path": "/api/v1/products", "status": 200, "remote": "[::1]:2281", "request_id": "44bf8b0a-4d37-439a-9da5-6188250ab8a6", "duration": "1.2813ms"}
+2025-07-29T12:44:20.206+0300	INFO	httphelper/shutdown.go:19	shutting down server...
+2025-07-29T12:44:20.207+0300	INFO	httphelper/shutdown.go:28	server exited properly
+2025-07-29T12:45:55.256+0300	INFO	app/main.go:36	server started	{"port": "8080"}
+2025-07-29T12:45:58.707+0300	INFO	middlewares/logger.go:28	http request	{"method": "POST", "path": "/api/v1/products", "status": 401, "remote": "[::1]:2326", "request_id": "24cf16ac-051c-4529-ae31-d435f9995cf9", "duration": "0s"}
+2025-07-29T12:46:08.800+0300	INFO	handlers/product.go:65	product created	{"slug": "table-skandi"}
+2025-07-29T12:46:08.800+0300	INFO	middlewares/logger.go:28	http request	{"method": "POST", "path": "/api/v1/products", "status": 201, "remote": "[::1]:2326", "request_id": "d9ab2221-6d04-457d-894e-d0f0c621304a", "duration": "6.959ms"}
+2025-07-29T12:46:29.125+0300	INFO	middlewares/logger.go:28	http request	{"method": "POST", "path": "/api/v1/upload", "status": 201, "remote": "[::1]:2326", "request_id": "a6b1a4e1-bd25-42ae-8521-dfa1e8fb32a0", "duration": "19.9889ms"}
+2025-07-29T12:46:55.931+0300	INFO	handlers/product.go:130	products fetched	{"count": 1}
+2025-07-29T12:46:55.931+0300	INFO	middlewares/logger.go:28	http request	{"method": "GET", "path": "/api/v1/products", "status": 200, "remote": "[::1]:2326", "request_id": "d3f0b307-87da-4dec-a45c-6d580587efa3", "duration": "1.2ms"}
+2025-07-29T12:50:45.618+0300	INFO	httphelper/shutdown.go:19	shutting down server...
+2025-07-29T12:50:45.618+0300	INFO	httphelper/shutdown.go:28	server exited properly
+2025-07-29T12:56:27.826+0300	INFO	app/main.go:36	server started	{"port": "8080"}
+2025-07-29T12:56:33.375+0300	INFO	middlewares/logger.go:28	http request	{"method": "POST", "path": "/api/v1/upload", "status": 201, "remote": "[::1]:2431", "request_id": "43136ddb-9138-4bcb-87b2-281b15e84c26", "duration": "21.6177ms"}
+2025-07-29T12:56:37.959+0300	ERROR	handlers/product.go:125	failed to get products	{"error": "conn busy"}
+dozenChairs/internal/handlers.(*ProductHandler).GetAll
+	D:/ProjectsGo/dozenChairs/internal/handlers/product.go:125
+net/http.HandlerFunc.ServeHTTP
+	D:/Program Files/Go/src/net/http/server.go:2294
+github.com/go-chi/chi/v5.(*Mux).routeHTTP
+	C:/Users/Ramcache/go/pkg/mod/github.com/go-chi/chi/v5@v5.2.2/mux.go:478
+net/http.HandlerFunc.ServeHTTP
+	D:/Program Files/Go/src/net/http/server.go:2294
+github.com/go-chi/chi/v5.(*Mux).ServeHTTP
+	C:/Users/Ramcache/go/pkg/mod/github.com/go-chi/chi/v5@v5.2.2/mux.go:73
+github.com/go-chi/chi/v5.(*Mux).Mount.func1
+	C:/Users/Ramcache/go/pkg/mod/github.com/go-chi/chi/v5@v5.2.2/mux.go:325
+net/http.HandlerFunc.ServeHTTP
+	D:/Program Files/Go/src/net/http/server.go:2294
+github.com/go-chi/chi/v5.(*Mux).routeHTTP
+	C:/Users/Ramcache/go/pkg/mod/github.com/go-chi/chi/v5@v5.2.2/mux.go:478
+net/http.HandlerFunc.ServeHTTP
+	D:/Program Files/Go/src/net/http/server.go:2294
+dozenChairs/pkg/app.SetupRouter.Logger.func4.1
+	D:/ProjectsGo/dozenChairs/internal/middlewares/logger.go:26
+net/http.HandlerFunc.ServeHTTP
+	D:/Program Files/Go/src/net/http/server.go:2294
+dozenChairs/pkg/app.SetupRouter.CORS.func3.1
+	D:/ProjectsGo/dozenChairs/internal/middlewares/cors.go:23
+net/http.HandlerFunc.ServeHTTP
+	D:/Program Files/Go/src/net/http/server.go:2294
+dozenChairs/pkg/app.SetupRouter.RequestID.func2.1
+	D:/ProjectsGo/dozenChairs/internal/middlewares/request_id.go:23
+net/http.HandlerFunc.ServeHTTP
+	D:/Program Files/Go/src/net/http/server.go:2294
+dozenChairs/pkg/app.SetupRouter.Recover.func1.1
+	D:/ProjectsGo/dozenChairs/internal/middlewares/recover.go:22
+net/http.HandlerFunc.ServeHTTP
+	D:/Program Files/Go/src/net/http/server.go:2294
+github.com/go-chi/chi/v5.(*Mux).ServeHTTP
+	C:/Users/Ramcache/go/pkg/mod/github.com/go-chi/chi/v5@v5.2.2/mux.go:90
+net/http.serverHandler.ServeHTTP
+	D:/Program Files/Go/src/net/http/server.go:3301
+net/http.(*conn).serve
+	D:/Program Files/Go/src/net/http/server.go:2102
+2025-07-29T12:56:37.960+0300	INFO	middlewares/logger.go:28	http request	{"method": "GET", "path": "/api/v1/products", "status": 500, "remote": "[::1]:2431", "request_id": "d262c758-cd4b-4ba6-a4c5-cb72713654fb", "duration": "2.1117ms"}
+2025-07-29T12:57:21.767+0300	INFO	httphelper/shutdown.go:19	shutting down server...
+2025-07-29T12:57:21.768+0300	INFO	httphelper/shutdown.go:28	server exited properly
+2025-07-29T12:59:34.443+0300	INFO	app/main.go:35	server started	{"port": "8080"}
+2025-07-29T12:59:37.848+0300	INFO	handlers/product.go:130	products fetched	{"count": 1}
+2025-07-29T12:59:37.848+0300	INFO	middlewares/logger.go:28	http request	{"method": "GET", "path": "/api/v1/products", "status": 200, "remote": "[::1]:2474", "request_id": "812502e1-f150-417c-a76f-78e6592ddb33", "duration": "115.0351ms"}
+2025-07-29T13:01:26.217+0300	INFO	httphelper/shutdown.go:19	shutting down server...
+2025-07-29T13:01:26.218+0300	INFO	httphelper/shutdown.go:28	server exited properly
+2025-07-29T13:11:27.563+0300	INFO	app/main.go:35	server started	{"port": "8080"}
+2025-07-29T13:11:35.913+0300	INFO	middlewares/logger.go:28	http request	{"method": "GET", "path": "/swagger/index.html", "status": 200, "remote": "[::1]:2653", "request_id": "7fcc36c0-7da7-43a6-abe1-8387c7ce681f", "duration": "1.1006ms"}
+2025-07-29T13:11:35.962+0300	INFO	middlewares/logger.go:28	http request	{"method": "GET", "path": "/swagger/swagger-ui.css", "status": 200, "remote": "[::1]:2653", "request_id": "6b07dd17-2ee6-4094-a68a-770a7f0c9585", "duration": "0s"}
+2025-07-29T13:11:35.979+0300	INFO	middlewares/logger.go:28	http request	{"method": "GET", "path": "/swagger/swagger-ui-standalone-preset.js", "status": 200, "remote": "[::1]:2654", "request_id": "095e310d-949d-4454-b5b3-9a46ac1de274", "duration": "2.675ms"}
+2025-07-29T13:11:35.983+0300	INFO	middlewares/logger.go:28	http request	{"method": "GET", "path": "/swagger/swagger-ui-bundle.js", "status": 200, "remote": "[::1]:2653", "request_id": "950611bd-a469-4247-8538-5e693ef82a0a", "duration": "6.5613ms"}
+2025-07-29T13:11:36.168+0300	INFO	middlewares/logger.go:28	http request	{"method": "GET", "path": "/swagger/doc.json", "status": 500, "remote": "[::1]:2653", "request_id": "3992a6a8-eaf5-4b60-8810-6be8e975dcf0", "duration": "0s"}
+2025-07-29T13:11:54.407+0300	INFO	middlewares/logger.go:28	http request	{"method": "GET", "path": "/swagger/index.html", "status": 200, "remote": "[::1]:2653", "request_id": "8895ce29-3bdb-47db-ba72-47f7b03f322a", "duration": "0s"}
+2025-07-29T13:11:54.428+0300	INFO	middlewares/logger.go:28	http request	{"method": "GET", "path": "/swagger/swagger-ui.css", "status": 304, "remote": "[::1]:2653", "request_id": "decd4c4c-7d0f-486f-a7c1-63a0669c4e1c", "duration": "0s"}
+2025-07-29T13:11:54.428+0300	INFO	middlewares/logger.go:28	http request	{"method": "GET", "path": "/swagger/swagger-ui-bundle.js", "status": 304, "remote": "[::1]:2654", "request_id": "544d809e-c481-4d8f-9ff6-815afb99f08f", "duration": "0s"}
+2025-07-29T13:11:54.428+0300	INFO	middlewares/logger.go:28	http request	{"method": "GET", "path": "/swagger/swagger-ui-standalone-preset.js", "status": 304, "remote": "[::1]:2659", "request_id": "40f7abde-4490-453c-be4f-700dff741309", "duration": "0s"}
+2025-07-29T13:11:54.484+0300	INFO	middlewares/logger.go:28	http request	{"method": "GET", "path": "/swagger/doc.json", "status": 500, "remote": "[::1]:2659", "request_id": "d83a881d-5ccb-4046-9f08-8f2554fdd4d7", "duration": "0s"}
+2025-07-29T13:11:54.525+0300	INFO	middlewares/logger.go:28	http request	{"method": "GET", "path": "/swagger/favicon-32x32.png", "status": 200, "remote": "[::1]:2659", "request_id": "e7b042a1-8425-49f7-8077-673bd45335d0", "duration": "0s"}
+2025-07-29T13:12:56.136+0300	INFO	httphelper/shutdown.go:19	shutting down server...
+2025-07-29T13:12:56.138+0300	INFO	httphelper/shutdown.go:28	server exited properly
+2025-07-29T13:12:58.941+0300	INFO	app/main.go:35	server started	{"port": "8080"}
+2025-07-29T13:13:01.469+0300	INFO	middlewares/logger.go:28	http request	{"method": "GET", "path": "/swagger/index.html", "status": 200, "remote": "[::1]:2670", "request_id": "22519cc4-8b5a-440d-860e-17d215c9271f", "duration": "577.4µs"}
+2025-07-29T13:13:01.490+0300	INFO	middlewares/logger.go:28	http request	{"method": "GET", "path": "/swagger/swagger-ui.css", "status": 200, "remote": "[::1]:2670", "request_id": "ad8a1293-568a-4e3f-85fd-fceabc96cf8c", "duration": "520.7µs"}
+2025-07-29T13:13:01.498+0300	INFO	middlewares/logger.go:28	http request	{"method": "GET", "path": "/swagger/swagger-ui-standalone-preset.js", "status": 200, "remote": "[::1]:2671", "request_id": "90e51456-158c-4b67-92af-5be55b901fef", "duration": "3.4026ms"}
+2025-07-29T13:13:01.501+0300	INFO	middlewares/logger.go:28	http request	{"method": "GET", "path": "/swagger/swagger-ui-bundle.js", "status": 200, "remote": "[::1]:2670", "request_id": "69445f47-fca7-40ac-bee4-84c702ad9fce", "duration": "6.4985ms"}
+2025-07-29T13:13:01.707+0300	INFO	middlewares/logger.go:28	http request	{"method": "GET", "path": "/swagger/doc.json", "status": 200, "remote": "[::1]:2670", "request_id": "8d8c1f6e-6ec1-4b81-83f7-73c798ad720e", "duration": "0s"}
+2025-07-29T13:13:01.710+0300	INFO	middlewares/logger.go:28	http request	{"method": "GET", "path": "/swagger/favicon-32x32.png", "status": 200, "remote": "[::1]:2670", "request_id": "7526c176-6e5d-44ef-a2f7-3f3b633ead1c", "duration": "0s"}
+2025-07-29T13:13:21.699+0300	INFO	httphelper/shutdown.go:19	shutting down server...
+2025-07-29T13:13:21.700+0300	INFO	httphelper/shutdown.go:28	server exited properly
+2025-07-29T13:17:59.193+0300	INFO	app/main.go:35	server started	{"port": "8080"}
+2025-07-29T13:18:06.244+0300	INFO	middlewares/logger.go:28	http request	{"method": "POST", "path": "/api/v1/upload", "status": 401, "remote": "[::1]:2770", "request_id": "96f16853-1fb4-4b0a-b2af-3ca856e59a0c", "duration": "524.1µs"}
+2025-07-29T13:18:12.077+0300	INFO	middlewares/logger.go:28	http request	{"method": "POST", "path": "/api/v1/auth/refresh", "status": 200, "remote": "[::1]:2774", "request_id": "321cb4e3-9f60-4564-9017-8658e98155c8", "duration": "84.9968ms"}
+2025-07-29T13:18:35.165+0300	INFO	middlewares/logger.go:28	http request	{"method": "GET", "path": "/api/v1//products/table-001/images", "status": 404, "remote": "[::1]:2774", "request_id": "a1de06cb-bb26-4ad2-9773-4ae0ff09cf9e", "duration": "0s"}
+2025-07-29T13:19:49.232+0300	INFO	middlewares/logger.go:28	http request	{"method": "POST", "path": "/api/v1/upload", "status": 401, "remote": "[::1]:2793", "request_id": "32ad66f1-18cf-4010-9210-745ada546d30", "duration": "539.2µs"}
+2025-07-29T13:19:58.240+0300	INFO	middlewares/logger.go:28	http request	{"method": "POST", "path": "/api/v1/upload", "status": 201, "remote": "[::1]:2796", "request_id": "64f19b15-cdaf-46a4-a09d-c3bf117248ec", "duration": "20.3498ms"}
+2025-07-29T13:20:09.070+0300	INFO	middlewares/logger.go:28	http request	{"method": "GET", "path": "/api/v1//products/table-001/images", "status": 404, "remote": "[::1]:2796", "request_id": "c312ed19-f72d-4af4-8194-5d63a6668090", "duration": "0s"}
+2025-07-29T13:20:19.454+0300	INFO	middlewares/logger.go:28	http request	{"method": "GET", "path": "/api/v1/products/table-001/images", "status": 200, "remote": "[::1]:2796", "request_id": "770600ac-0827-4fba-a6c8-5d31ce42ef84", "duration": "546.1µs"}
+2025-07-29T13:21:18.718+0300	INFO	middlewares/logger.go:28	http request	{"method": "DELETE", "path": "/api/v1//images/table-001", "status": 404, "remote": "[::1]:2796", "request_id": "20933fa1-2740-4256-b7a5-54ba928d07a8", "duration": "0s"}
+2025-07-29T13:21:24.110+0300	INFO	middlewares/logger.go:28	http request	{"method": "DELETE", "path": "/api/v1/images/table-001", "status": 500, "remote": "[::1]:2796", "request_id": "fe656df3-5015-457e-8dd0-b72c60da9cfe", "duration": "8.2422ms"}
+2025-07-29T13:21:35.139+0300	INFO	middlewares/logger.go:28	http request	{"method": "DELETE", "path": "/api/v1/images/0cf77566-7df2-4c33-8e44-612b7648c468", "status": 200, "remote": "[::1]:2796", "request_id": "ea540d57-c95e-452b-a87d-f1dd0ce8589c", "duration": "795.6µs"}
+2025-07-29T13:23:39.710+0300	INFO	httphelper/shutdown.go:19	shutting down server...
+2025-07-29T13:23:39.711+0300	INFO	httphelper/shutdown.go:28	server exited properly

@@ -28,15 +28,16 @@ func NewProductHandler(s services.ProductService, l logger.Logger) *ProductHandl
 
 // Create godoc
 // @Summary      Создать товар
-// @Description  Только для админов. Создаёт новый товар или набор.
+// @Description  Только для админов. Создаёт новый товар или набор. У набора нужно указать поле `includes`, а у обычного товара — `unitCount` и `attributes`.
 // @Tags         Products
 // @Security     BearerAuth
 // @Accept       json
 // @Produce      json
-// @Param        product  body      models.Product  true  "Товар"
+// @Param        product  body      models.Product  true  "Данные нового товара или набора"
 // @Success      201      {object}  models.Product
 // @Failure      400      {object}  httphelper.APIResponse
 // @Failure      500      {object}  httphelper.APIResponse
+// @Router       /api/v1/products [post]
 func (h *ProductHandler) Create(w http.ResponseWriter, r *http.Request) {
 	if r.Header.Get("Content-Type") != "application/json" {
 		httphelper.WriteError(w, http.StatusUnsupportedMediaType, "Content-Type must be application/json")
@@ -68,7 +69,7 @@ func (h *ProductHandler) Create(w http.ResponseWriter, r *http.Request) {
 
 // GetBySlug godoc
 // @Summary      Получить товар по slug
-// @Description  Возвращает один товар по его уникальному slug
+// @Description  Возвращает один товар по его уникальному slug. Включает изображения, атрибуты и, при типе set — включённые товары.
 // @Tags         Products
 // @Produce      json
 // @Param        slug  path      string  true  "Slug товара"
@@ -92,7 +93,7 @@ func (h *ProductHandler) GetBySlug(w http.ResponseWriter, r *http.Request) {
 
 // GetAll godoc
 // @Summary      Получить список товаров
-// @Description  Возвращает список товаров или наборов, можно фильтровать и сортировать
+// @Description  Возвращает список товаров или наборов. Доступна фильтрация по типу, категории и наличию, а также сортировка по цене и дате создания.
 // @Tags         Products
 // @Produce      json
 // @Param        type     query    string  false  "Тип товара (product или set)"
@@ -133,7 +134,7 @@ func (h *ProductHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 
 // GetSets godoc
 // @Summary      Получить список наборов
-// @Description  Возвращает все товары типа set
+// @Description  Возвращает все товары типа set. Наборы включают список вложенных товаров (`includes`).
 // @Tags         Sets
 // @Produce      json
 // @Param        inStock query    boolean false  "Есть в наличии"
@@ -171,7 +172,7 @@ func (h *ProductHandler) GetSets(w http.ResponseWriter, r *http.Request) {
 
 // GetSetBySlug godoc
 // @Summary      Получить набор по slug
-// @Description  Возвращает товар типа set по его slug. Если это не set — ошибка.
+// @Description  Возвращает товар типа set по его slug. Если товар не является набором, будет возвращена ошибка.
 // @Tags         Sets
 // @Produce      json
 // @Param        slug  path      string  true  "Slug набора"
@@ -202,6 +203,7 @@ func (h *ProductHandler) GetSetBySlug(w http.ResponseWriter, r *http.Request) {
 
 // GetCategories godoc
 // @Summary      Получить список категорий
+// @Description  Возвращает все уникальные категории товаров
 // @Tags         Products
 // @Produce      json
 // @Success      200  {array}  string
@@ -221,13 +223,13 @@ func (h *ProductHandler) GetCategories(w http.ResponseWriter, r *http.Request) {
 
 // Update godoc
 // @Summary      Обновить товар
-// @Description  Только для админов. Обновляет данные товара по slug
+// @Description  Только для админов. Обновляет данные товара по slug. Все поля можно изменить, включая изображения, состав набора и атрибуты.
 // @Tags         Products
 // @Security     BearerAuth
 // @Accept       json
 // @Produce      json
 // @Param        slug     path      string          true  "Slug товара"
-// @Param        product  body      models.Product  true  "Обновлённые данные"
+// @Param        product  body      models.Product  true  "Обновлённые данные товара"
 // @Success      200      {object}  models.Product
 // @Failure      400      {object}  httphelper.APIResponse
 // @Failure      500      {object}  httphelper.APIResponse
@@ -260,7 +262,7 @@ func (h *ProductHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 // Delete godoc
 // @Summary      Удалить товар
-// @Description  Только для админов. Удаляет товар по slug
+// @Description  Только для админов. Удаляет товар по slug. При удалении набора удаляется только сам набор, не включённые в него товары.
 // @Tags         Products
 // @Security     BearerAuth
 // @Produce      json

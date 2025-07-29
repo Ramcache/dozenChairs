@@ -1,4 +1,3 @@
-basePath: /api/v1
 definitions:
   dozenChairs_internal_dto.AccessTokenResponse:
     properties:
@@ -54,6 +53,19 @@ definitions:
       role:
         type: string
     type: object
+  dozenChairs_internal_models.Image:
+    properties:
+      created_at:
+        type: string
+      filename:
+        type: string
+      id:
+        type: string
+      product_id:
+        type: string
+      url:
+        type: string
+    type: object
   dozenChairs_internal_models.IncludeItem:
     properties:
       productId:
@@ -80,7 +92,7 @@ definitions:
         type: string
       images:
         items:
-          type: string
+          $ref: '#/definitions/dozenChairs_internal_models.Image'
         type: array
       inStock:
         type: boolean
@@ -136,19 +148,108 @@ definitions:
       error: {}
       meta: {}
     type: object
-host: localhost:8080
 info:
-  contact:
-    email: ramaro@internet.ru
-    name: API Support
-  description: REST API for managing chairs, tables and sets
-  license:
-    name: MIT
-    url: https://opensource.org/licenses/MIT
-  termsOfService: http://swagger.io/terms/
-  title: DozenChairs API
-  version: "1.0"
+  contact: {}
 paths:
+  /api/v1//images/{id}:
+    delete:
+      parameters:
+      - description: Image ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Удалить изображение по ID
+      tags:
+      - Images
+  /api/v1//products/{product_id}/images:
+    get:
+      parameters:
+      - description: ID или slug товара
+        in: path
+        name: product_id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dozenChairs_internal_models.Image'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Получить изображения по товару
+      tags:
+      - Images
+  /api/v1//upload:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: ID товара
+        in: formData
+        name: product_id
+        required: true
+        type: string
+      - description: Файлы изображений (можно несколько)
+        in: formData
+        name: images
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            items:
+              $ref: '#/definitions/dozenChairs_internal_models.Image'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Загрузить изображения для продукта
+      tags:
+      - Images
   /api/v1/auth/login:
     post:
       consumes:
@@ -266,6 +367,7 @@ paths:
       - auth
   /api/v1/categories:
     get:
+      description: Возвращает все уникальные категории товаров
       produces:
       - application/json
       responses:
@@ -284,7 +386,8 @@ paths:
       - Products
   /api/v1/products:
     get:
-      description: Возвращает список товаров или наборов, можно фильтровать и сортировать
+      description: Возвращает список товаров или наборов. Доступна фильтрация по типу,
+        категории и наличию, а также сортировка по цене и дате создания.
       parameters:
       - description: Тип товара (product или set)
         in: query
@@ -329,9 +432,10 @@ paths:
     post:
       consumes:
       - application/json
-      description: Только для админов. Создаёт новый товар или набор.
+      description: Только для админов. Создаёт новый товар или набор. У набора нужно
+        указать поле `includes`, а у обычного товара — `unitCount` и `attributes`.
       parameters:
-      - description: Товар
+      - description: Данные нового товара или набора
         in: body
         name: product
         required: true
@@ -359,7 +463,8 @@ paths:
       - Products
   /api/v1/products/{slug}:
     delete:
-      description: Только для админов. Удаляет товар по slug
+      description: Только для админов. Удаляет товар по slug. При удалении набора
+        удаляется только сам набор, не включённые в него товары.
       parameters:
       - description: Slug товара
         in: path
@@ -381,7 +486,8 @@ paths:
       tags:
       - Products
     get:
-      description: Возвращает один товар по его уникальному slug
+      description: Возвращает один товар по его уникальному slug. Включает изображения,
+        атрибуты и, при типе set — включённые товары.
       parameters:
       - description: Slug товара
         in: path
@@ -409,14 +515,15 @@ paths:
     put:
       consumes:
       - application/json
-      description: Только для админов. Обновляет данные товара по slug
+      description: Только для админов. Обновляет данные товара по slug. Все поля можно
+        изменить, включая изображения, состав набора и атрибуты.
       parameters:
       - description: Slug товара
         in: path
         name: slug
         required: true
         type: string
-      - description: Обновлённые данные
+      - description: Обновлённые данные товара
         in: body
         name: product
         required: true
@@ -444,7 +551,8 @@ paths:
       - Products
   /api/v1/sets:
     get:
-      description: Возвращает все товары типа set
+      description: Возвращает все товары типа set. Наборы включают список вложенных
+        товаров (`includes`).
       parameters:
       - description: Есть в наличии
         in: query
@@ -480,7 +588,8 @@ paths:
       - Sets
   /api/v1/sets/{slug}:
     get:
-      description: Возвращает товар типа set по его slug. Если это не set — ошибка.
+      description: Возвращает товар типа set по его slug. Если товар не является набором,
+        будет возвращена ошибка.
       parameters:
       - description: Slug набора
         in: path
@@ -509,9 +618,4 @@ paths:
       summary: Получить набор по slug
       tags:
       - Sets
-securityDefinitions:
-  BearerAuth:
-    in: header
-    name: Authorization
-    type: apiKey
 swagger: "2.0"

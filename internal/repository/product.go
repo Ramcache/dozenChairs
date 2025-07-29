@@ -5,7 +5,7 @@ import (
 	"dozenChairs/internal/models"
 	"encoding/json"
 	"fmt"
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"strings"
 )
 
@@ -19,7 +19,7 @@ type ProductRepository interface {
 }
 
 type productRepo struct {
-	db *pgx.Conn
+	db *pgxpool.Pool
 }
 
 type ProductFilter struct {
@@ -31,13 +31,12 @@ type ProductFilter struct {
 	Offset   int
 }
 
-func NewProductRepo(db *pgx.Conn) ProductRepository {
+func NewProductRepo(db *pgxpool.Pool) ProductRepository {
 	return &productRepo{db: db}
 }
 
 func (r *productRepo) Create(p *models.Product) error {
 	attrJson, _ := json.Marshal(p.Attributes)
-	imagesJson, _ := json.Marshal(p.Images)
 	includesJson, _ := json.Marshal(p.Includes)
 	tagsJson, _ := json.Marshal(p.Tags)
 
@@ -45,11 +44,11 @@ func (r *productRepo) Create(p *models.Product) error {
 	INSERT INTO products (
 		id, type, category, title, slug, description,
 		price, old_price, in_stock, unit_count,
-		images, attributes, includes, tags, created_at, updated_at
+		attributes, includes, tags, created_at, updated_at
 	) VALUES (
 		$1, $2, $3, $4, $5, $6,
 		$7, $8, $9, $10,
-		$11, $12, $13, $14, $15, $16
+		$11, $12, $13, $14, $15
 	)`
 
 	_, err := r.db.Exec(
@@ -57,7 +56,7 @@ func (r *productRepo) Create(p *models.Product) error {
 		query,
 		p.ID, p.Type, p.Category, p.Title, p.Slug, p.Description,
 		p.Price, p.OldPrice, p.InStock, p.UnitCount,
-		string(imagesJson), string(attrJson), string(includesJson), string(tagsJson),
+		string(attrJson), string(includesJson), string(tagsJson),
 		p.CreatedAt, p.UpdatedAt,
 	)
 
@@ -65,35 +64,53 @@ func (r *productRepo) Create(p *models.Product) error {
 }
 
 func (r *productRepo) GetBySlug(slug string) (*models.Product, error) {
-	query := `SELECT id, type, category, title, slug, description, price, old_price, in_stock, unit_count,
-	                 images, attributes, includes, tags, created_at, updated_at
+	query := `SELECT id, type, category, title, slug, description, price, old_price,
+	                 in_stock, unit_count, attributes, includes, tags, created_at, updated_at
 	          FROM products WHERE slug = $1`
 
 	var p models.Product
-	var images, attributes, includes, tags []byte
+	var attributes, includes, tags []byte
 
 	err := r.db.QueryRow(context.Background(), query, slug).Scan(
 		&p.ID, &p.Type, &p.Category, &p.Title, &p.Slug, &p.Description,
 		&p.Price, &p.OldPrice, &p.InStock, &p.UnitCount,
-		&images, &attributes, &includes, &tags,
+		&attributes, &includes, &tags,
 		&p.CreatedAt, &p.UpdatedAt,
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	// Разбираем JSON-поля
-	_ = json.Unmarshal(images, &p.Images)
+	// Распаковываем JSON-поля
 	_ = json.Unmarshal(attributes, &p.Attributes)
 	_ = json.Unmarshal(includes, &p.Includes)
 	_ = json.Unmarshal(tags, &p.Tags)
+
+	// Загружаем изображения
+	imageQuery := `SELECT id, product_id, url, filename FROM images WHERE product_id = $1`
+
+	rows, err := r.db.Query(context.Background(), imageQuery, p.ID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var images []models.Image
+	for rows.Next() {
+		var img models.Image
+		if err := rows.Scan(&img.ID, &img.ProductID, &img.URL, &img.Filename); err != nil {
+			return nil, err
+		}
+		images = append(images, img)
+	}
+	p.Images = images
 
 	return &p, nil
 }
 
 func (r *productRepo) GetAll(f ProductFilter) ([]*models.Product, error) {
 	query := `SELECT id, type, category, title, slug, description, price, old_price, in_stock, unit_count,
-	                 images, attributes, includes, tags, created_at, updated_at
+	                 attributes, includes, tags, created_at, updated_at
 	          FROM products`
 	args := []interface{}{}
 	where := []string{}
@@ -147,22 +164,36 @@ func (r *productRepo) GetAll(f ProductFilter) ([]*models.Product, error) {
 	var products []*models.Product
 	for rows.Next() {
 		var p models.Product
-		var images, attributes, includes, tags []byte
+		var attributes, includes, tags []byte
 
 		err := rows.Scan(
 			&p.ID, &p.Type, &p.Category, &p.Title, &p.Slug, &p.Description,
 			&p.Price, &p.OldPrice, &p.InStock, &p.UnitCount,
-			&images, &attributes, &includes, &tags,
+			&attributes, &includes, &tags,
 			&p.CreatedAt, &p.UpdatedAt,
 		)
 		if err != nil {
 			return nil, err
 		}
 
-		_ = json.Unmarshal(images, &p.Images)
 		_ = json.Unmarshal(attributes, &p.Attributes)
 		_ = json.Unmarshal(includes, &p.Includes)
 		_ = json.Unmarshal(tags, &p.Tags)
+
+		// загрузка изображений отдельно
+		imgRows, err := r.db.Query(context.Background(), `SELECT id, product_id, url, filename FROM images WHERE product_id = $1`, p.ID)
+		if err != nil {
+			return nil, err
+		}
+		defer imgRows.Close()
+
+		for imgRows.Next() {
+			var img models.Image
+			if err := imgRows.Scan(&img.ID, &img.ProductID, &img.URL, &img.Filename); err != nil {
+				return nil, err
+			}
+			p.Images = append(p.Images, img)
+		}
 
 		products = append(products, &p)
 	}
@@ -202,15 +233,13 @@ func (r *productRepo) Update(slug string, p *models.Product) error {
 		old_price = $7,
 		in_stock = $8,
 		unit_count = $9,
-		images = $10,
-		attributes = $11,
-		includes = $12,
-		tags = $13,
-		updated_at = $14
-	WHERE slug = $15
+		attributes = $10,
+		includes = $11,
+		tags = $12,
+		updated_at = $13
+	WHERE slug = $14
 	`
 
-	images, _ := json.Marshal(p.Images)
 	attrs, _ := json.Marshal(p.Attributes)
 	includes, _ := json.Marshal(p.Includes)
 	tags, _ := json.Marshal(p.Tags)
@@ -218,7 +247,7 @@ func (r *productRepo) Update(slug string, p *models.Product) error {
 	_, err := r.db.Exec(context.Background(), query,
 		p.ID, p.Type, p.Category, p.Title, p.Description,
 		p.Price, p.OldPrice, p.InStock, p.UnitCount,
-		images, attrs, includes, tags,
+		attrs, includes, tags,
 		p.UpdatedAt, slug,
 	)
 

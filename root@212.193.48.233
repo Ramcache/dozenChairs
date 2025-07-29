@@ -1,0 +1,5 @@
+SERVER_PORT=8080
+DATABASE_URL=postgres://postgres:625325@localhost:5432/dozenChairs_db?sslmode=disable
+
+JWT_ACCESS_SECRET=my_super_secret_key
+JWT_REFRESH_SECRET=my_refresh_secret_key
