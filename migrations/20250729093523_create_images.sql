@@ -7,6 +7,5 @@ CREATE TABLE images (
                         created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-
 -- +goose Down
-DROP TABLE images;
+DROP TABLE IF EXISTS images;

@@ -3,6 +3,7 @@ package middlewares
 import (
 	"context"
 	"dozenChairs/internal/auth"
+	"dozenChairs/pkg/config"
 	"dozenChairs/pkg/httphelper"
 	"net/http"
 	"strings"
@@ -18,6 +19,15 @@ const (
 func RequireAuth(jwt *auth.JWTManager) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			cfg := config.LoadConfig()
+			if !cfg.AuthEnabled {
+				// Пропускаем авторизацию
+				ctx := context.WithValue(r.Context(), userIDKey, "debug-user")
+				ctx = context.WithValue(ctx, roleKey, "admin") // или "user" — смотри сам
+				next.ServeHTTP(w, r.WithContext(ctx))
+				return
+			}
+
 			authHeader := r.Header.Get("Authorization")
 			if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
 				httphelper.WriteError(w, http.StatusUnauthorized, "Missing or invalid Authorization header")
@@ -38,17 +48,15 @@ func RequireAuth(jwt *auth.JWTManager) func(http.Handler) http.Handler {
 	}
 }
 
-func Role() contextKey {
-	return roleKey
-}
-
-func UserID() contextKey {
-	return userIDKey
-}
-
 func RequireRole(requiredRole string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			cfg := config.LoadConfig()
+			if !cfg.AuthEnabled {
+				next.ServeHTTP(w, r) // пропускаем проверку роли
+				return
+			}
+
 			role, ok := r.Context().Value(roleKey).(string)
 			if !ok || role != requiredRole {
 				httphelper.WriteError(w, http.StatusForbidden, "Forbidden: insufficient permissions")
@@ -57,4 +65,12 @@ func RequireRole(requiredRole string) func(http.Handler) http.Handler {
 			next.ServeHTTP(w, r)
 		})
 	}
+}
+
+func Role() contextKey {
+	return roleKey
+}
+
+func UserID() contextKey {
+	return userIDKey
 }
