@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 	"dozenChairs/internal/models"
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type SessionRepository interface {
@@ -14,10 +14,10 @@ type SessionRepository interface {
 }
 
 type sessionRepo struct {
-	db *pgx.Conn
+	db *pgxpool.Pool
 }
 
-func NewSessionRepo(db *pgx.Conn) SessionRepository {
+func NewSessionRepo(db *pgxpool.Pool) SessionRepository {
 	return &sessionRepo{db: db}
 }
 

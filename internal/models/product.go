@@ -22,7 +22,7 @@ type Product struct {
 	OldPrice    *int                   `json:"oldPrice,omitempty" validate:"omitempty,gte=0"`
 	InStock     bool                   `json:"inStock"`
 	UnitCount   *int                   `json:"unitCount,omitempty" validate:"omitempty,gte=0"`
-	Images      []string               `json:"images,omitempty"`
+	Images      []Image                `json:"images"`
 	Attributes  map[string]interface{} `json:"attributes,omitempty"`
 	Includes    []IncludeItem          `json:"includes,omitempty" validate:"omitempty,dive"` // только для sets
 	Tags        []string               `json:"tags,omitempty"`

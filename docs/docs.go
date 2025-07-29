@@ -9,20 +9,163 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "termsOfService": "http://swagger.io/terms/",
-        "contact": {
-            "name": "API Support",
-            "email": "ramaro@internet.ru"
-        },
-        "license": {
-            "name": "MIT",
-            "url": "https://opensource.org/licenses/MIT"
-        },
+        "contact": {},
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/v1//images/{id}": {
+            "delete": {
+                "tags": [
+                    "Images"
+                ],
+                "summary": "Удалить изображение по ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Image ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1//products/{product_id}/images": {
+            "get": {
+                "tags": [
+                    "Images"
+                ],
+                "summary": "Получить изображения по товару",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID или slug товара",
+                        "name": "product_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dozenChairs_internal_models.Image"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1//upload": {
+            "post": {
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Images"
+                ],
+                "summary": "Загрузить изображения для продукта",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID товара",
+                        "name": "product_id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Файлы изображений (можно несколько)",
+                        "name": "images",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dozenChairs_internal_models.Image"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/auth/login": {
             "post": {
                 "description": "Принимает email и пароль, возвращает access и refresh токены",
@@ -203,6 +346,7 @@ const docTemplate = `{
         },
         "/api/v1/categories": {
             "get": {
+                "description": "Возвращает все уникальные категории товаров",
                 "produces": [
                     "application/json"
                 ],
@@ -231,7 +375,7 @@ const docTemplate = `{
         },
         "/api/v1/products": {
             "get": {
-                "description": "Возвращает список товаров или наборов, можно фильтровать и сортировать",
+                "description": "Возвращает список товаров или наборов. Доступна фильтрация по типу, категории и наличию, а также сортировка по цене и дате создания.",
                 "produces": [
                     "application/json"
                 ],
@@ -301,7 +445,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Только для админов. Создаёт новый товар или набор.",
+                "description": "Только для админов. Создаёт новый товар или набор. У набора нужно указать поле ` + "`" + `includes` + "`" + `, а у обычного товара — ` + "`" + `unitCount` + "`" + ` и ` + "`" + `attributes` + "`" + `.",
                 "consumes": [
                     "application/json"
                 ],
@@ -314,7 +458,7 @@ const docTemplate = `{
                 "summary": "Создать товар",
                 "parameters": [
                     {
-                        "description": "Товар",
+                        "description": "Данные нового товара или набора",
                         "name": "product",
                         "in": "body",
                         "required": true,
@@ -347,7 +491,7 @@ const docTemplate = `{
         },
         "/api/v1/products/{slug}": {
             "get": {
-                "description": "Возвращает один товар по его уникальному slug",
+                "description": "Возвращает один товар по его уникальному slug. Включает изображения, атрибуты и, при типе set — включённые товары.",
                 "produces": [
                     "application/json"
                 ],
@@ -391,7 +535,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Только для админов. Обновляет данные товара по slug",
+                "description": "Только для админов. Обновляет данные товара по slug. Все поля можно изменить, включая изображения, состав набора и атрибуты.",
                 "consumes": [
                     "application/json"
                 ],
@@ -411,7 +555,7 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "Обновлённые данные",
+                        "description": "Обновлённые данные товара",
                         "name": "product",
                         "in": "body",
                         "required": true,
@@ -447,7 +591,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Только для админов. Удаляет товар по slug",
+                "description": "Только для админов. Удаляет товар по slug. При удалении набора удаляется только сам набор, не включённые в него товары.",
                 "produces": [
                     "application/json"
                 ],
@@ -479,7 +623,7 @@ const docTemplate = `{
         },
         "/api/v1/sets": {
             "get": {
-                "description": "Возвращает все товары типа set",
+                "description": "Возвращает все товары типа set. Наборы включают список вложенных товаров (` + "`" + `includes` + "`" + `).",
                 "produces": [
                     "application/json"
                 ],
@@ -534,7 +678,7 @@ const docTemplate = `{
         },
         "/api/v1/sets/{slug}": {
             "get": {
-                "description": "Возвращает товар типа set по его slug. Если это не set — ошибка.",
+                "description": "Возвращает товар типа set по его slug. Если товар не является набором, будет возвращена ошибка.",
                 "produces": [
                     "application/json"
                 ],
@@ -662,6 +806,26 @@ const docTemplate = `{
                 }
             }
         },
+        "dozenChairs_internal_models.Image": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "filename": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "product_id": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
         "dozenChairs_internal_models.IncludeItem": {
             "type": "object",
             "required": [
@@ -707,7 +871,7 @@ const docTemplate = `{
                 "images": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/dozenChairs_internal_models.Image"
                     }
                 },
                 "inStock": {
@@ -780,24 +944,17 @@ const docTemplate = `{
                 "meta": {}
             }
         }
-    },
-    "securityDefinitions": {
-        "BearerAuth": {
-            "type": "apiKey",
-            "name": "Authorization",
-            "in": "header"
-        }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "1.0",
-	Host:             "localhost:8080",
-	BasePath:         "/api/v1",
+	Version:          "",
+	Host:             "",
+	BasePath:         "",
 	Schemes:          []string{},
-	Title:            "DozenChairs API",
-	Description:      "REST API for managing chairs, tables and sets",
+	Title:            "",
+	Description:      "",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
