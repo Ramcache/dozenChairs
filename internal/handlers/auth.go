@@ -54,6 +54,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Регистрируем пользователя
 	user, err := h.service.Register(input)
 	if err != nil {
 		h.logger.Error("register failed", zap.Error(err))
@@ -61,9 +62,29 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Генерируем токены (как при логине)
+	refreshToken, accessToken, err := h.jwtManager.GenerateTokens(user.ID, user.Role)
+	if err != nil {
+		h.logger.Error("token generation failed", zap.Error(err))
+		httphelper.WriteError(w, http.StatusInternalServerError, "Failed to generate tokens")
+		return
+	}
+
+	// Устанавливаем refresh токен в cookie
+	http.SetCookie(w, &http.Cookie{
+		Name:     "refresh_token",
+		Value:    refreshToken,
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteStrictMode,
+		Path:     "/",
+		Expires:  time.Now().Add(h.jwtManager.RefreshTTL),
+	})
+
+	// Лог и ответ
 	h.logger.Info("user registered", zap.String("id", user.ID), zap.String("email", user.Email))
 	httphelper.WriteSuccess(w, http.StatusCreated, map[string]string{
-		"id": user.ID,
+		"access_token": accessToken,
 	})
 }
 
