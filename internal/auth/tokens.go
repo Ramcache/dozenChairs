@@ -36,3 +36,17 @@ func (j *JWTManager) GenerateRefresh(userID string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(j.refreshSecret))
 }
+
+func (j *JWTManager) GenerateTokens(userID, role string) (refreshToken, accessToken string, err error) {
+	accessToken, err = j.GenerateAccess(userID, role)
+	if err != nil {
+		return "", "", err
+	}
+
+	refreshToken, err = j.GenerateRefresh(userID)
+	if err != nil {
+		return "", "", err
+	}
+
+	return refreshToken, accessToken, nil
+}
