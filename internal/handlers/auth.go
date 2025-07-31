@@ -83,8 +83,14 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 
 	// Лог и ответ
 	h.logger.Info("user registered", zap.String("id", user.ID), zap.String("email", user.Email))
-	httphelper.WriteSuccess(w, http.StatusCreated, map[string]string{
+	httphelper.WriteSuccess(w, http.StatusOK, map[string]interface{}{
 		"access_token": accessToken,
+		"user": map[string]interface{}{
+			"id":    user.ID,
+			"email": user.Email,
+			"role":  user.Role,
+			"name":  user.Username,
+		},
 	})
 }
 
@@ -130,9 +136,16 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 	// return access token
 	h.logger.Info("user logged in", zap.String("id", user.ID))
-	httphelper.WriteSuccess(w, http.StatusOK, map[string]string{
+	httphelper.WriteSuccess(w, http.StatusOK, map[string]interface{}{
 		"access_token": accessToken,
+		"user": map[string]interface{}{
+			"id":    user.ID,
+			"email": user.Email,
+			"role":  user.Role,
+			"name":  user.Username,
+		},
 	})
+
 }
 
 // Refresh godoc

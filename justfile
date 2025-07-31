@@ -39,7 +39,7 @@ migrate-down-one:
 # ==== SWAGGER ====
 
 swag-init:
-    {{SWAG}} init -g app/main.go
+    {{SWAG}} init --parseDependency --parseInternal -g app/main.go
 
 # ==== DEPLOY ====
 
