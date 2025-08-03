@@ -35,6 +35,9 @@ func RegisterRoutes(
 			r.Post("/auth/refresh", authHandler.Refresh)
 			r.Post("/auth/logout", authHandler.Logout)
 
+			r.Get("/api/v1/auth/oauth/{provider}", authHandler.BeginOAuth)
+			r.Get("/api/v1/auth/callback/{provider}", authHandler.OAuthCallback)
+
 			r.Get("/products", productHandler.GetAll)
 			r.Get("/products/{slug}", productHandler.GetBySlug)
 			r.Get("/products/sets/{slug}", productHandler.GetSetBySlug)

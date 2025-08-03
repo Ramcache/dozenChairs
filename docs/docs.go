@@ -166,6 +166,59 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/auth/callback/{provider}": {
+            "get": {
+                "description": "Обрабатывает код, полученный от VK, Google или Yandex, и возвращает JWT токены",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Callback от OAuth-провайдера",
+                "parameters": [
+                    {
+                        "enum": [
+                            "google",
+                            "yandex",
+                            "vk"
+                        ],
+                        "type": "string",
+                        "description": "OAuth-провайдер",
+                        "name": "provider",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Код от OAuth-провайдера",
+                        "name": "code",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dozenChairs_internal_dto.AuthResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dozenChairs_internal_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dozenChairs_internal_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/auth/login": {
             "post": {
                 "description": "Принимает email и пароль, возвращает access и refresh токены",
@@ -262,6 +315,46 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dozenChairs_internal_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/oauth/{provider}": {
+            "get": {
+                "description": "Редиректит пользователя на страницу авторизации Google, VK или Yandex",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Перенаправление на OAuth-провайдера",
+                "parameters": [
+                    {
+                        "enum": [
+                            "google",
+                            "yandex",
+                            "vk"
+                        ],
+                        "type": "string",
+                        "description": "OAuth-провайдер",
+                        "name": "provider",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "307": {
+                        "description": "Redirect",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/dozenChairs_internal_dto.ErrorResponse"
                         }
@@ -741,6 +834,9 @@ const docTemplate = `{
                 },
                 "refreshToken": {
                     "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/dozenChairs_internal_dto.UserResponse"
                 }
             }
         },
