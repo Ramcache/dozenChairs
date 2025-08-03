@@ -18,6 +18,7 @@ type AuthService interface {
 	ValidateSession(userID, tokenHash string) error
 	Logout(tokenHash string) error
 	Me(userID string) (*models.User, error)
+	OAuthLogin(email, username, provider string, jwt *auth.JWTManager) (*models.User, string, string, error)
 }
 
 type authService struct {
@@ -113,4 +114,50 @@ func (s *authService) Logout(tokenHash string) error {
 
 func (s *authService) Me(userID string) (*models.User, error) {
 	return s.userRepo.GetByID(userID)
+}
+
+func (s *authService) OAuthLogin(email, username, provider string, jwt *auth.JWTManager) (*models.User, string, string, error) {
+	user, err := s.userRepo.GetByEmail(email)
+	if err != nil {
+		// Пользователь не найден — создаём
+		user = &models.User{
+			ID:           uuid.NewString(),
+			Username:     username,
+			Email:        email,
+			PasswordHash: "", // нет пароля
+			Role:         "user",
+			CreatedAt:    time.Now(),
+		}
+		if err := s.userRepo.Create(user); err != nil {
+			return nil, "", "", err
+		}
+	}
+
+	// Генерация токенов
+	accessToken, err := jwt.GenerateAccess(user.ID, user.Role)
+	if err != nil {
+		return nil, "", "", err
+	}
+
+	refreshToken, err := jwt.GenerateRefresh(user.ID)
+	if err != nil {
+		return nil, "", "", err
+	}
+
+	hash := security.SHA256Sum(refreshToken)
+	session := &models.Session{
+		ID:        uuid.NewString(),
+		UserID:    user.ID,
+		TokenHash: hash,
+		UserAgent: provider,
+		IPAddress: provider,
+		ExpiresAt: time.Now().Add(jwt.RefreshTTL),
+		CreatedAt: time.Now(),
+	}
+
+	if err := s.sessionRepo.Create(session); err != nil {
+		return nil, "", "", err
+	}
+
+	return user, refreshToken, accessToken, nil
 }

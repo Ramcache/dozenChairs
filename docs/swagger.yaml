@@ -10,6 +10,8 @@ definitions:
         type: string
       refreshToken:
         type: string
+      user:
+        $ref: '#/definitions/dozenChairs_internal_dto.UserResponse'
     type: object
   dozenChairs_internal_dto.ErrorResponse:
     properties:
@@ -250,6 +252,43 @@ paths:
       summary: Загрузить изображения для продукта
       tags:
       - Images
+  /api/v1/auth/callback/{provider}:
+    get:
+      description: Обрабатывает код, полученный от VK, Google или Yandex, и возвращает
+        JWT токены
+      parameters:
+      - description: OAuth-провайдер
+        enum:
+        - google
+        - yandex
+        - vk
+        in: path
+        name: provider
+        required: true
+        type: string
+      - description: Код от OAuth-провайдера
+        in: query
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dozenChairs_internal_dto.AuthResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dozenChairs_internal_dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dozenChairs_internal_dto.ErrorResponse'
+      summary: Callback от OAuth-провайдера
+      tags:
+      - auth
   /api/v1/auth/login:
     post:
       consumes:
@@ -314,6 +353,34 @@ paths:
       security:
       - BearerAuth: []
       summary: Получить информацию о текущем пользователе
+      tags:
+      - auth
+  /api/v1/auth/oauth/{provider}:
+    get:
+      description: Редиректит пользователя на страницу авторизации Google, VK или
+        Yandex
+      parameters:
+      - description: OAuth-провайдер
+        enum:
+        - google
+        - yandex
+        - vk
+        in: path
+        name: provider
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "307":
+          description: Redirect
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dozenChairs_internal_dto.ErrorResponse'
+      summary: Перенаправление на OAuth-провайдера
       tags:
       - auth
   /api/v1/auth/refresh:
