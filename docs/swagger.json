@@ -571,6 +571,49 @@
                 }
             }
         },
+        "/api/v1/products/new": {
+            "get": {
+                "description": "Возвращает список недавно добавленных товаров — либо последние N штук, либо за последние X дней",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Получить список новинок",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Лимит (по умолчанию 10)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "За сколько последних дней брать товары",
+                        "name": "days",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dozenChairs_internal_models.Product"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dozenChairs_pkg_httphelper.APIResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/products/{slug}": {
             "get": {
                 "description": "Возвращает один товар по его уникальному slug. Включает изображения, атрибуты и, при типе set — включённые товары.",

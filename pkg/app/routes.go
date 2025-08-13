@@ -10,6 +10,7 @@ import (
 	"dozenChairs/pkg/config"
 	"dozenChairs/pkg/logger"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"net/http"
 
@@ -23,6 +24,7 @@ func RegisterRoutes(
 	imageHandler *handlers.ImageHandler,
 	jwtManager *auth.JWTManager,
 ) {
+
 	// Swagger
 	r.Get("/swagger/*", httpSwagger.WrapHandler)
 
@@ -41,6 +43,7 @@ func RegisterRoutes(
 			r.Get("/products", productHandler.GetAll)
 			r.Get("/products/{slug}", productHandler.GetBySlug)
 			r.Get("/products/sets/{slug}", productHandler.GetSetBySlug)
+			r.Get("/products/new", productHandler.GetNew)
 
 			r.Get("/sets", productHandler.GetSets)
 			r.Get("/categories", productHandler.GetCategories)
@@ -94,10 +97,14 @@ func SetupRouter(cfg *config.Config, log logger.Logger, conn *pgxpool.Pool) http
 
 	// Роутер
 	r := chi.NewRouter()
+	r.Use(middlewares.MetricsMiddleware)
 	r.Use(middlewares.Recover(log))
 	r.Use(middlewares.RequestID())
 	r.Use(middlewares.CORS())
 	r.Use(middlewares.Logger(log))
+
+	// Endpoint для Prometheus
+	r.Handle("/metrics", promhttp.Handler()) // просто без .Methods("GET")
 
 	r.Get("/swagger/*", httpSwagger.WrapHandler)
 	r.Handle("/uploads/*", http.StripPrefix("/uploads/", http.FileServer(http.Dir("./uploads"))))

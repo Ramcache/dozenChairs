@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"dozenChairs/internal/metrics"
 	"dozenChairs/internal/models"
 	"dozenChairs/internal/services"
 	"dozenChairs/pkg/httphelper"
@@ -93,6 +94,7 @@ func (h *ImageHandler) Upload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	httphelper.WriteSuccess(w, http.StatusCreated, uploaded)
+	metrics.ImagesUploaded.Inc()
 }
 
 // Delete

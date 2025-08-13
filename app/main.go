@@ -1,6 +1,7 @@
 package main
 
 import (
+	"dozenChairs/internal/metrics"
 	"dozenChairs/pkg/app"
 	"dozenChairs/pkg/config"
 	"dozenChairs/pkg/db"
@@ -17,6 +18,7 @@ func main() {
 	logger.Init(false)
 	defer logger.Sync()
 	log := logger.Log
+	metrics.Init() // ← добавь сюда
 
 	// Подключение к БД
 	conn := db.MustConnectDB(cfg, log)
