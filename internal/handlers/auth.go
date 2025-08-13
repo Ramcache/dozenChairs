@@ -3,6 +3,7 @@ package handlers
 import (
 	"dozenChairs/internal/auth"
 	"dozenChairs/internal/dto"
+	"dozenChairs/internal/metrics"
 	"dozenChairs/internal/middlewares"
 	"dozenChairs/internal/services"
 	"dozenChairs/pkg/config"
@@ -96,6 +97,8 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 			"name":  user.Username,
 		},
 	})
+	metrics.RegisterTotal.Inc()
+
 }
 
 // Login godoc
@@ -123,9 +126,11 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	user, refreshToken, accessToken, err := h.service.Login(req, h.jwtManager, r.RemoteAddr, r.UserAgent())
 	if err != nil {
 		h.logger.Error("login failed", zap.Error(err))
+		metrics.LoginFailedTotal.Inc()
 		httphelper.WriteError(w, http.StatusUnauthorized, "Invalid credentials")
 		return
 	}
+	metrics.LoginSuccessTotal.Inc()
 
 	// Set refresh token in cookie
 	http.SetCookie(w, &http.Cookie{
@@ -391,6 +396,7 @@ func (h *AuthHandler) OAuthCallback(w http.ResponseWriter, r *http.Request) {
 		httphelper.WriteError(w, http.StatusInternalServerError, "OAuth login failed")
 		return
 	}
+	metrics.OAuthLoginTotal.Inc()
 
 	http.SetCookie(w, &http.Cookie{
 		Name:     "refresh_token",

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"dozenChairs/internal/metrics"
 	"dozenChairs/internal/models"
 	"dozenChairs/internal/repository"
 	"dozenChairs/internal/services"
@@ -9,6 +10,7 @@ import (
 	"dozenChairs/pkg/validation"
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
@@ -62,7 +64,7 @@ func (h *ProductHandler) Create(w http.ResponseWriter, r *http.Request) {
 		httphelper.WriteError(w, http.StatusInternalServerError, "Failed to create product")
 		return
 	}
-
+	metrics.ProductsCreated.Inc()
 	h.logger.Info("product created", zap.String("slug", p.Slug))
 	httphelper.WriteSuccess(w, http.StatusCreated, p)
 }
@@ -86,6 +88,7 @@ func (h *ProductHandler) GetBySlug(w http.ResponseWriter, r *http.Request) {
 		httphelper.WriteError(w, http.StatusNotFound, "Product not found")
 		return
 	}
+	metrics.ProductFetched.Inc()
 
 	h.logger.Info("product fetched", zap.String("id", p.ID), zap.String("slug", slug))
 	httphelper.WriteSuccess(w, http.StatusOK, p)
@@ -127,6 +130,7 @@ func (h *ProductHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 		httphelper.WriteError(w, http.StatusInternalServerError, "Failed to load products")
 		return
 	}
+	metrics.ProductsFetched.Inc()
 
 	h.logger.Info("products fetched", zap.Int("count", len(products)))
 	httphelper.WriteSuccess(w, http.StatusOK, products)
@@ -258,6 +262,7 @@ func (h *ProductHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 	h.logger.Info("product updated", zap.String("slug", slug))
 	httphelper.WriteSuccess(w, http.StatusOK, p)
+	metrics.ProductsUpdated.Inc()
 }
 
 // Delete godoc
@@ -280,5 +285,41 @@ func (h *ProductHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.logger.Info("product deleted", zap.String("slug", slug))
+	metrics.ProductsDeleted.Inc()
 	w.WriteHeader(http.StatusNoContent)
+}
+
+// GetNew godoc
+// @Summary      Получить список новинок
+// @Description  Возвращает список недавно добавленных товаров — либо последние N штук, либо за последние X дней
+// @Tags         Products
+// @Produce      json
+// @Param        limit  query    int  false  "Лимит (по умолчанию 10)"
+// @Param        days   query    int  false  "За сколько последних дней брать товары"
+// @Success      200    {array}  models.Product
+// @Failure      500    {object} httphelper.APIResponse
+// @Router       /api/v1/products/new [get]
+func (h *ProductHandler) GetNew(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query()
+	limit := httphelper.ParseInt(q.Get("limit"), 10)
+	days := httphelper.ParseInt(q.Get("days"), 0)
+
+	filter := repository.ProductFilter{
+		Sort:  "createdAt",
+		Limit: limit,
+	}
+
+	if days > 0 {
+		filter.FromDate = time.Now().AddDate(0, 0, -days)
+	}
+
+	products, err := h.service.GetAll(filter)
+	if err != nil {
+		h.logger.Error("failed to get new products", zap.Error(err))
+		httphelper.WriteError(w, http.StatusInternalServerError, "Failed to load new products")
+		return
+	}
+
+	h.logger.Info("new products fetched", zap.Int("count", len(products)))
+	httphelper.WriteSuccess(w, http.StatusOK, products)
 }

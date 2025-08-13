@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"strings"
+	"time"
 )
 
 type ProductRepository interface {
@@ -29,6 +30,7 @@ type ProductFilter struct {
 	Sort     string
 	Limit    int
 	Offset   int
+	FromDate time.Time
 }
 
 func NewProductRepo(db *pgxpool.Pool) ProductRepository {
@@ -129,6 +131,11 @@ func (r *productRepo) GetAll(f ProductFilter) ([]*models.Product, error) {
 	if f.InStock != nil {
 		where = append(where, fmt.Sprintf("in_stock = $%d", i))
 		args = append(args, *f.InStock)
+		i++
+	}
+	if !f.FromDate.IsZero() {
+		where = append(where, fmt.Sprintf("created_at >= $%d", i))
+		args = append(args, f.FromDate)
 		i++
 	}
 
