@@ -114,51 +114,52 @@ func (r *productRepo) GetAll(f ProductFilter) ([]*models.Product, error) {
 	query := `SELECT id, type, category, title, slug, description, price, old_price, in_stock, unit_count,
 	                 attributes, includes, tags, created_at, updated_at
 	          FROM products`
-	args := []interface{}{}
-	where := []string{}
-	i := 1
+	var args []interface{}
+	var where []string
+
+	addFilter := func(cond string, val interface{}) {
+		where = append(where, fmt.Sprintf("%s = $%d", cond, len(args)+1))
+		args = append(args, val)
+	}
 
 	if f.Type != "" {
-		where = append(where, fmt.Sprintf("type = $%d", i))
-		args = append(args, f.Type)
-		i++
+		addFilter("type", f.Type)
 	}
 	if f.Category != "" {
-		where = append(where, fmt.Sprintf("category = $%d", i))
-		args = append(args, f.Category)
-		i++
+		addFilter("category", f.Category)
 	}
 	if f.InStock != nil {
-		where = append(where, fmt.Sprintf("in_stock = $%d", i))
-		args = append(args, *f.InStock)
-		i++
+		addFilter("in_stock", *f.InStock)
 	}
 	if !f.FromDate.IsZero() {
-		where = append(where, fmt.Sprintf("created_at >= $%d", i))
+		where = append(where, fmt.Sprintf("created_at >= $%d", len(args)+1))
 		args = append(args, f.FromDate)
-		i++
 	}
 
 	if len(where) > 0 {
 		query += " WHERE " + strings.Join(where, " AND ")
 	}
 
+	// сортировка
 	if f.Sort != "" {
-		switch f.Sort {
-		case "price", "createdAt":
-			query += fmt.Sprintf(" ORDER BY %s", map[string]string{"price": "price", "createdAt": "created_at"}[f.Sort])
+		sortMap := map[string]string{
+			"price":     "price",
+			"createdAt": "created_at",
+		}
+		if col, ok := sortMap[f.Sort]; ok {
+			query += " ORDER BY " + col
 		}
 	} else {
 		query += " ORDER BY created_at DESC"
 	}
 
+	// пагинация
 	if f.Limit > 0 {
-		query += fmt.Sprintf(" LIMIT $%d", i)
+		query += fmt.Sprintf(" LIMIT $%d", len(args)+1)
 		args = append(args, f.Limit)
-		i++
 	}
 	if f.Offset > 0 {
-		query += fmt.Sprintf(" OFFSET $%d", i)
+		query += fmt.Sprintf(" OFFSET $%d", len(args)+1)
 		args = append(args, f.Offset)
 	}
 
@@ -173,13 +174,12 @@ func (r *productRepo) GetAll(f ProductFilter) ([]*models.Product, error) {
 		var p models.Product
 		var attributes, includes, tags []byte
 
-		err := rows.Scan(
+		if err := rows.Scan(
 			&p.ID, &p.Type, &p.Category, &p.Title, &p.Slug, &p.Description,
 			&p.Price, &p.OldPrice, &p.InStock, &p.UnitCount,
 			&attributes, &includes, &tags,
 			&p.CreatedAt, &p.UpdatedAt,
-		)
-		if err != nil {
+		); err != nil {
 			return nil, err
 		}
 
@@ -187,20 +187,22 @@ func (r *productRepo) GetAll(f ProductFilter) ([]*models.Product, error) {
 		_ = json.Unmarshal(includes, &p.Includes)
 		_ = json.Unmarshal(tags, &p.Tags)
 
-		// загрузка изображений отдельно
-		imgRows, err := r.db.Query(context.Background(), `SELECT id, product_id, url, filename FROM images WHERE product_id = $1`, p.ID)
+		// загрузка изображений
+		imgRows, err := r.db.Query(context.Background(),
+			`SELECT id, product_id, url, filename FROM images WHERE product_id = $1`, p.ID)
 		if err != nil {
 			return nil, err
 		}
-		defer imgRows.Close()
 
 		for imgRows.Next() {
 			var img models.Image
 			if err := imgRows.Scan(&img.ID, &img.ProductID, &img.URL, &img.Filename); err != nil {
+				imgRows.Close()
 				return nil, err
 			}
 			p.Images = append(p.Images, img)
 		}
+		imgRows.Close()
 
 		products = append(products, &p)
 	}
