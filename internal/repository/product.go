@@ -121,7 +121,7 @@ func (r *productRepo) GetAll(f ProductFilter) ([]*models.Product, error) {
 		where = append(where, fmt.Sprintf("%s = $%d", cond, len(args)+1))
 		args = append(args, val)
 	}
-
+	//
 	if f.Type != "" {
 		addFilter("type", f.Type)
 	}
